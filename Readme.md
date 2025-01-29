@@ -2,26 +2,26 @@ Project Title: Gym Management System
 
 Project Overview: The Gym Management System is a web-based application designed to make the management of gym operations smooth and efficient. The system will enable the admin to add members, manage memberships, update membership plans, and track inactive members. It will also have the functionality to track and renew expiring memberships so that both the gym administrators and the members have a smooth experience.
 
-Key Features: 1.)Admin Dashboard:
+Key Features: 1.Admin Dashboard:
 
 All member details at one place (name, photo, date of joining, membership type, etc.)
 
 Membership expiring soon and inactive members' real-time updates
 
-2.)Member Management
+2.Member Management
 
 Add new members with profile details like name, photo, contact information, and date of joining.
 Update the member details such as contact details, membership type, etc.
 Delete inactive members or mark them as inactive
-3.)Membership Plan Management
+3.Membership Plan Management
 
 Add, edit, and delete membership plans like monthly, quarterly, annual, etc.
 Dynamic change in membership pricing
-4.)Membership Renewal:
+4.Membership Renewal:
 
 Notify the admin whose membership plans are soon to expire.
 Streamline the renewal process with the updating of member details along with plan validity.
-5.)Inactive Members Tracking
+5.Inactive Members Tracking
 
 List members who haven't checked in for sometime, automatically.
 Notify the admin to get follow-ups or promotions.
