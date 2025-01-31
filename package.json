@@ -1,11 +1,19 @@
 {
   "name": "gym_management_system",
   "version": "1.0.0",
-  "description": "This is Setup dev environment",
+"description": "This is setup dev environment",
+  "description": "This is setup dev enviornment",
+
+ 
+
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+
+  "author": "madhav",
+
+  
+
   "license": "ISC"
 }
