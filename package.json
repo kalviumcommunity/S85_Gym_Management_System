@@ -1,12 +1,11 @@
 {
   "name": "gym_management_system",
   "version": "1.0.0",
-  "description": "Project Title: Gym Management System",
+  "description": "This is Setup dev environment",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC"
 }
