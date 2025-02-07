@@ -1,25 +1,15 @@
 {
-
-  "dependencies": {
-    "express": "^4.21.2"
-  }
-
   "name": "gym_management_system",
   "version": "1.0.0",
-
-  "description": "This is setup dev enviornment",
-
- 
-
-  "main": "index.js",
+  "description": "A gym management system",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-
+  "dependencies": {
+    "express": "^4.21.2"
+  },
   "author": "madhav",
-
-  
-
   "license": "ISC"
 
 }
