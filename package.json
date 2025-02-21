@@ -4,12 +4,13 @@
   "description": "A gym management system",
   "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.1"
   },
   "author": "madhav",
   "license": "ISC"
-
 }
