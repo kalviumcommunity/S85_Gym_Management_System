@@ -1,0 +1,27 @@
+meta {
+  name: post
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/api/members
+  body: json
+  auth: none
+}
+
+headers {
+  Key: Content-Type
+  Value: application/json
+}
+
+body:json {
+  {
+      "memberID": "101",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "9876543210",
+      "membershipType": "Gold"
+  }
+  
+}
