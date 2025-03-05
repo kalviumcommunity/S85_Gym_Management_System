@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const connectDatabase = require("./config/db");
+const connectDatabase = require("./middleware/db");
 const gymRoutes = require("./routes/routes"); // Correct path
 
 
