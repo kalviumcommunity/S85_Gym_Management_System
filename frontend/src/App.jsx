@@ -1,9 +1,14 @@
-import LandingPage from "./LandingPage";
-
+import React from "react";
+import GymCard from "./components/GymCard"; // Import the reusable component
 
 function App() {
-  return <LandingPage />;
+  return (
+    <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+      <GymCard name="Madhav Garg" membershipType="Diamond" status="Active" joiningDate="01 Jan 2024" />
+      <GymCard name="Tanmay Bhatt" membershipType="Gold" status="Inactive" joiningDate="15 Feb 2023" />
+      <GymCard name="Nishant" membershipType="Platinum" status="Active" joiningDate="10 Mar 2022" />
+    </div>
+  );
 }
 
 export default App;
-
