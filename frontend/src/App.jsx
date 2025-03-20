@@ -1,13 +1,22 @@
 import React from "react";
 import GymCard from "./components/GymCard"; // Import the reusable component
-
+import MembersList from "./components/MembersList";
 function App() {
   return (
+    <>
+    
     <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
       <GymCard name="Madhav Garg" membershipType="Diamond" status="Active" joiningDate="01 Jan 2024" />
       <GymCard name="Tanmay Bhatt" membershipType="Gold" status="Inactive" joiningDate="15 Feb 2023" />
       <GymCard name="Nishant" membershipType="Platinum" status="Active" joiningDate="10 Mar 2022" />
     </div>
+    <div>
+            <h1>Gym Management</h1>
+            <MembersList />
+        </div>
+
+    </>
+    
   );
 }
 
