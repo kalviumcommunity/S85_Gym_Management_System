@@ -7,8 +7,8 @@ const memberSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   membershipType: { type: String, required: true },
-  joiningDate: { type: Date, default: Date.now },
-  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+  joiningDate: { type: Date, required: true },
+  status: { type: String,required: true, enum: ["Active", "Inactive","Expired"] },
 });
 
 

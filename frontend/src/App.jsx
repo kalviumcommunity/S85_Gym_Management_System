@@ -1,7 +1,14 @@
 import React from "react";
+import { useState } from "react";
 import GymCard from "./components/GymCard"; // Import the reusable component
 import MembersList from "./components/MembersList";
+import AddMember from "./components/AddMember";
 function App() {
+  const [updateFlag, setUpdateFlag] = useState(false);
+
+  const refreshMembers = () => {
+      setUpdateFlag(prev => !prev);
+  };
   return (
     <>
     
@@ -11,8 +18,10 @@ function App() {
       <GymCard name="Nishant" membershipType="Platinum" status="Active" joiningDate="10 Mar 2022" />
     </div> */}
     <div>
-            <h1>Gym Management</h1>
-            <MembersList />
+            <h1 style={{color:"black"}}>Gym Management</h1>
+            <AddMember onMemberAdded={refreshMembers} />
+            <MembersList key={updateFlag}/>
+            
         </div>
 
     </>
