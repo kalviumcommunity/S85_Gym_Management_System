@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Member } = require("../models/gymSchemas");
+router.use(express.json());
 
 // Fetch all members (READ)
 router.get("/members", async (req, res) => {
@@ -26,16 +27,57 @@ router.get("/members/:id", async (req, res) => {
 });
 
 // Add a new member (CREATE)
+// router.post("/members", async (req, res) => {
+//     try {
+//         const { memberID, name, email, phone, membershipType } = req.body;
+//         const newMember = new Member({ memberID, name, email, phone, membershipType });
+//         await newMember.save();
+//         res.status(201).json({ message: "Member added successfully", newMember });
+//     } catch (error) {
+//         res.status(400).json({ message: "Error adding member", error });
+//     }
+// });
+
+
+
+
+
 router.post("/members", async (req, res) => {
     try {
-        const { memberID, name, email, phone, membershipType } = req.body;
-        const newMember = new Member({ memberID, name, email, phone, membershipType });
+        const { name, email, phone, membershipType, joiningDate, status } = req.body;
+
+        // ✅ Check if all required fields are provided
+        if (!name || !email || !phone || !membershipType || !status) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+        const memberID = req.body.memberID || Math.floor(100000 + Math.random() * 900000).toString();  
+
+        const newMember = new Member({
+            memberID,
+            name,
+            email,
+            phone,
+            membershipType,
+            joiningDate: joiningDate || new Date(),
+            status
+        });
+
         await newMember.save();
-        res.status(201).json({ message: "Member added successfully", newMember });
+        res.status(201).json({ message: "Member added successfully", member: newMember });
     } catch (error) {
-        res.status(400).json({ message: "Error adding member", error });
+        console.error("Error adding member:", error);
+        res.status(500).json({ message: "Server error" });
     }
 });
+
+
+
+
+
+
+
+
+
 
 // Update a member by ID (UPDATE)
 router.put("/members/:id", async (req, res) => {
