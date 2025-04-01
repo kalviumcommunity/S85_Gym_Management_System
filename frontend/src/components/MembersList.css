@@ -46,4 +46,32 @@
     margin: 5px 0;
     color: #555;
   }
+  /* Button Style */
+  button {
+    padding: 8px 16px;   /* Reduce padding to make the button more compact */
+    font-size: 14px;     /* Set a common font size */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
   
+  /* Update Button Style */
+  .update-button {
+    background-color: #5ea9fe; /* Light Blue */
+    color: white;
+  }
+  
+  .update-button:hover {
+    background-color: #45a049; /* Darker shade on hover */
+  }
+  
+  /* Delete Button Style */
+  .delete-button {
+    background-color: #f44336; /* Red color */
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+  }
