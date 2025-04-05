@@ -2,4 +2,4 @@
 
 
    ## Deployment
-The project is deployed on Cloudflare: [Live Demo](https://gym-managment-system.pages.dev/)
+The project is deployed on Cloudflare: [Live Demo](https://gym-managment.pages.dev/)
