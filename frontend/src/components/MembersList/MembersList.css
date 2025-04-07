@@ -114,3 +114,69 @@
   background-color: #f9f9f9;
   border-color: #bbb;
 }
+/* MembersList.css */
+
+.members-container {
+  padding: 40px 20px;
+  font-family: 'Segoe UI', sans-serif;
+  max-width: 900px;
+  margin: auto;
+}
+
+.members-container h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+.members-container ol {
+  list-style: none;
+  padding: 0;
+}
+
+.members-container li {
+  background: #fff;
+  margin-bottom: 20px;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.members-container li h3 {
+  margin-top: 0;
+  color: #2d3436;
+}
+
+.update-button,
+.delete-button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid #bbb;
+  color: #2d3436;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+}
+
+.update-button:hover,
+.delete-button:hover {
+  background: #eee;
+}
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+  .members-container {
+    padding: 20px 10px;
+  }
+
+  .members-container li {
+    padding: 18px;
+  }
+
+  .update-button,
+  .delete-button {
+    width: 100%;
+    margin: 10px 0;
+  }
+}
