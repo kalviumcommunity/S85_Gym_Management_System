@@ -1,99 +1,145 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
+/* Base Layout */
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Left Side with Image and Text */
+.auth-left {
+  flex: 1;
+  background-image: url('https://images.unsplash.com/photo-1576678927484-cc907957088c?w=1600&auto=format&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+.auth-left h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.auth-left p {
+  font-size: 1.2rem;
+  max-width: 400px;
+}
+
+/* Right Side with Form */
+.auth-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9); /* overlay to maintain readability */
+}
+
+.auth-form {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1;
+}
+
+.auth-form h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #333;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-form button:hover {
+  background-color: #555;
+}
+
+.switch-auth {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.switch-auth a {
+  color: #333;
+  text-decoration: underline;
+}
+
+/* 🌐 Responsive Design */
+@media screen and (max-width: 768px) {
   .auth-page {
-    display: flex;
-    height: 100vh;
-  }
-  
-  .auth-left {
-    flex: 1;
-    background: url("https://images.unsplash.com/photo-1590487988256-9ed24133863e") no-repeat center center/cover;
-    color: white;
-    padding: 50px;
-    display: flex;
     flex-direction: column;
-    justify-content: flex-end;
   }
-  
-  .auth-left h1 {
-    font-size: 34px;
-    margin-bottom: 10px;
-  }
-  
-  .auth-left p {
-    font-size: 16px;
-    opacity: 0.85;
-  }
-  
-  .auth-right {
-    flex: 1;
-    display: flex;
+
+  .auth-left {
+    padding: 40px 20px;
     align-items: center;
-    justify-content: center;
-    background-color: #f4f4f4;
-  }
-  
-  .auth-form {
-    background: white;
-    padding: 35px;
-    border-radius: 12px;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-  }
-  
-  .auth-form h2 {
     text-align: center;
-    margin-bottom: 25px;
-    font-size: 26px;
-    color: #333;
+    background-position: top;
   }
-  
+
+  .auth-left h1 {
+    font-size: 2.2rem;
+  }
+
+  .auth-left p {
+    font-size: 1rem;
+    max-width: 90%;
+  }
+
+  .auth-right {
+    background-color: #fff;
+    padding: 20px;
+  }
+
+  .auth-form {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 30px 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .auth-left h1 {
+    font-size: 1.8rem;
+  }
+
+  .auth-left p {
+    font-size: 0.95rem;
+  }
+
   .auth-form input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
     font-size: 15px;
   }
-  
+
   .auth-form button {
-    width: 100%;
-    padding: 12px;
-    background-color: #ff9900;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 8px;
-    transition: background 0.3s;
+    font-size: 15px;
   }
-  
-  .auth-form button:hover {
-    background-color: #e68900;
-  }
-  
-  .auth-form p,
-  .switch-auth {
-    text-align: center;
-    font-size: 14px;
-    color: #444;
-    margin-top: 12px;
-  }
-  
-  .auth-form a,
-  .switch-auth a {
-    color: #000;
-    font-weight: 500;
-    text-decoration: none;
-  }
-  
-  .switch-auth a:hover {
-    text-decoration: underline;
-  }
-  
+}
