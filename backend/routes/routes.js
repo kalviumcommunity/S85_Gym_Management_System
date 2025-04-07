@@ -26,19 +26,6 @@ router.get("/members/:id", async (req, res) => {
     }
 });
 
-// Add a new member (CREATE)
-// router.post("/members", async (req, res) => {
-//     try {
-//         const { memberID, name, email, phone, membershipType } = req.body;
-//         const newMember = new Member({ memberID, name, email, phone, membershipType });
-//         await newMember.save();
-//         res.status(201).json({ message: "Member added successfully", newMember });
-//     } catch (error) {
-//         res.status(400).json({ message: "Error adding member", error });
-//     }
-// });
-
-
 
 
 

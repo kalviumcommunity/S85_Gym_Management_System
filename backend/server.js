@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const connectDatabase = require("./middleware/db");
 const gymRoutes = require("./routes/routes"); // Correct path
+const authRoutes=require("./routes/authRoutes")
 const cors = require("cors");
 
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 
 // Use Routes
 app.use("/api", gymRoutes); // Now all member routes are under "/api/members"
+app.use("/api/auth", authRoutes);
 
 connectDatabase().then(() => {
     app.listen(PORT, () => {
