@@ -1,0 +1,116 @@
+.members-pro-container {
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+.members-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.members-header p {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.members-table-wrapper {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+}
+
+.members-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.members-table th,
+.members-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.members-table th {
+  background: #f2f2f2;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-placeholder {
+  background: #ddd;
+  width: 40px;
+  height: 40px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #444;
+}
+
+.email {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-badge.active {
+  background-color: #d4fce2;
+  color: #25a244;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #b59f00;
+}
+
+.status-badge.inactive {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+}
+
+/* Hover effect - soft background */
+.edit-btn:hover {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+
+/* Delete hover - same light style */
+.delete-btn:hover {
+  background-color: #f9f9f9;
+  border-color: #bbb;
+}

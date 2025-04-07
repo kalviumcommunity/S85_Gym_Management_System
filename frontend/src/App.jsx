@@ -1,35 +1,32 @@
 import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom"; // Correct import of Routes and Route
-import GymCard from "./components/GymCard";
-import MembersList from "./components/MembersList";
-import AddMember from "./components/AddMember";
-import UpdateMember from "./components/UpdateMember";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar/Navbar";
+import MembersList from "./components/MembersList/MembersList";
+import AddMember from "./components/AddMember/AddMember";
+import UpdateMember from "./components/UpdateMember/UpdateMember";
+import Home from "./components/Home/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import "./App.css";
 
 function App() {
   const [updateFlag, setUpdateFlag] = useState(false);
 
-  // Function to refresh the member list after adding or updating a member
   const refreshMembers = () => {
-      setUpdateFlag(prev => !prev); // Toggle to force re-render
+    setUpdateFlag(prev => !prev);
   };
 
   return (
     <>
-      <div>
-        <h1 style={{ color: "black",justifyContent:"center",display:"flex" }}>Gym Management</h1>
-
-        {/* AddMember Component: Add a new member */}
-        <AddMember onMemberAdded={refreshMembers} />
-
-        {/* Routes Component to handle different views */}
-        <Routes>
-          {/* Route to view and update member details */}
-          <Route path="/update/:id" element={<UpdateMember />} />
-
-          {/* Route to view members list, and pass updateFlag as a key to force re-render */}
-          <Route path="/" element={<MembersList key={updateFlag} />} />
-        </Routes>
-      </div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/add" element={<AddMember onMemberAdded={refreshMembers} />} />
+        <Route path="/members" element={<MembersList key={updateFlag} />} />
+        <Route path="/update/:id" element={<UpdateMember />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
     </>
   );
 }
