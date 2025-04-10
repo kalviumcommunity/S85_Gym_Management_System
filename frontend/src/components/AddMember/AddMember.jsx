@@ -17,12 +17,25 @@ const AddMember = ({ onMemberAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("❌ No token found. Please log in again.");
+        return;
+      }
+
       const response = await fetch("http://localhost:3000/api/members", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(formData),
       });
+
+      const responseData = await response.json();
 
       if (response.ok) {
         alert("✅ Member added successfully!");
@@ -34,10 +47,14 @@ const AddMember = ({ onMemberAdded }) => {
           joiningDate: "",
           status: "Active",
         });
-        onMemberAdded();
+        if (onMemberAdded) onMemberAdded();
+      } else {
+        console.error("Failed to add member:", responseData.message || responseData.error);
+        alert(`❌ Failed to add member: ${responseData.message || responseData.error}`);
       }
     } catch (error) {
       console.error("Error adding member:", error);
+      alert("❌ Something went wrong. Please try again.");
     }
   };
 
@@ -90,7 +107,6 @@ const AddMember = ({ onMemberAdded }) => {
             <input
               type="date"
               name="joiningDate"
-              placeholder="Joining Date"
               value={formData.joiningDate}
               onChange={handleChange}
               required

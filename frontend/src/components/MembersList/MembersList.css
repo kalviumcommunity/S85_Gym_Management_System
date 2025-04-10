@@ -180,3 +180,11 @@
     margin: 10px 0;
   }
 }
+.user-filter-dropdown {
+  margin-bottom: 1rem;
+  padding: 4px 5px;
+  font-size:14px;
+  border-radius: 100px;
+  border: 1px solid #8c8c8c;
+  outline: none;
+}
