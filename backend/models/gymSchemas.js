@@ -9,6 +9,11 @@ const memberSchema = new mongoose.Schema({
   membershipType: { type: String, required: true },
   joiningDate: { type: Date, required: true },
   status: { type: String,required: true, enum: ["Active", "Inactive","Expired"] },
+  membershipDuration: {
+    type: Number, // In days (e.g., 30, 60, 90)
+    required: true
+  },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 

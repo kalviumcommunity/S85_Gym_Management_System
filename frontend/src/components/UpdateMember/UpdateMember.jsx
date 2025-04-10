@@ -13,13 +13,18 @@ const UpdateMember = () => {
     joiningDate: "",
   });
 
-  const [showSuccess, setShowSuccess] = useState(false); // Success animation state
+  const [showSuccess, setShowSuccess] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     axios
-      .get(`http://localhost:3000/api/members/${id}`)
+      .get(`http://localhost:3000/api/members/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => setMemberData(response.data))
       .catch((error) => console.error("Error fetching member data:", error));
   }, [id]);
@@ -33,8 +38,13 @@ const UpdateMember = () => {
   };
 
   const handleUpdate = () => {
+    const token = localStorage.getItem("token");
     axios
-      .put(`http://localhost:3000/api/members/${id}`, memberData)
+      .put(`http://localhost:3000/api/members/${id}`, memberData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setShowSuccess(true);
         setTimeout(() => {
