@@ -1,7 +1,7 @@
 # Gym Management System - cloudflare Deployment Update
 
 ## Deployed site:-
-[Live Demo](https://ironcorefit.netlify.app/)
+[DEPLOYED LINK](https://ironcorefit.netlify.app/)
 
 
    ## Deployment
