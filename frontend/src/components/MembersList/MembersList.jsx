@@ -105,7 +105,7 @@ const MembersList = () => {
               <th>Membership</th>
               <th>Status</th>
               <th>Join Date</th>
-              <th>Last Check-in</th>
+              <th>Duration</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -139,7 +139,7 @@ const MembersList = () => {
                     </span>
                   </td>
                   <td>{new Date(member.joiningDate).toLocaleDateString()}</td>
-                  <td>{member.lastCheckin || "Not checked in yet"}</td>
+                  <td>{member.membershipDuration ? `${member.membershipDuration} days`: "N/A"}</td>
                   <td>
                     <button
                       className="edit-btn"

@@ -8,9 +8,9 @@ const memberSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   membershipType: { type: String, required: true },
   joiningDate: { type: Date, required: true },
-  status: { type: String,required: true, enum: ["Active", "Inactive","Expired"] },
+  status: { type: String,required: true, enum: ["active", "inactive","expired"] },
   membershipDuration: {
-    type: Number, // In days (e.g., 30, 60, 90)
+    type: String, // In days (e.g., 30, 60, 90)
     required: true
   },
   created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }

@@ -1,15 +1,20 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./AddMember.css";
+import Lottie from "lottie-react";
+import successAnimation from "../../assets/success.json/Animation - 1744280050642.json";
 
-const AddMember = ({ onMemberAdded }) => {
+const AddMember = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     membershipType: "",
     joiningDate: "",
-    status: "Active",
+    status: "active",
+    membershipDuration: "",
   });
+
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,15 +22,11 @@ const AddMember = ({ onMemberAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log("Submitting form");
+  
     try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("❌ No token found. Please log in again.");
-        return;
-      }
-
+      const token = localStorage.getItem("token"); // adjust if you're storing token differently
+  
       const response = await fetch("http://localhost:3000/api/members", {
         method: "POST",
         headers: {
@@ -34,76 +35,100 @@ const AddMember = ({ onMemberAdded }) => {
         },
         body: JSON.stringify(formData),
       });
-
-      const responseData = await response.json();
-
-      if (response.ok) {
-        alert("✅ Member added successfully!");
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          membershipType: "",
-          joiningDate: "",
-          status: "Active",
-        });
-        if (onMemberAdded) onMemberAdded();
-      } else {
-        console.error("Failed to add member:", responseData.message || responseData.error);
-        alert(`❌ Failed to add member: ${responseData.message || responseData.error}`);
+  
+      if (!response.ok) {
+        throw new Error("Failed to add member");
       }
+  
+      const data = await response.json();
+      console.log("Success:", data);
+      setSubmitted(true);
     } catch (error) {
-      console.error("Error adding member:", error);
-      alert("❌ Something went wrong. Please try again.");
+      console.error("Error:", error.message);
+      alert("Something went wrong while adding the member.");
     }
+  };
+  
+
+  const handleAddAnother = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      membershipType: "",
+      joiningDate: "",
+      status: "active",
+      membershipDuration: "",
+    });
+    setSubmitted(false);
   };
 
   return (
-    <div className="gym-add-wrapper">
-      <div className="form-container animated-form">
-        <h2>Add New Gym Member</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
+    <div className="add-member-page">
+      <div className="left-section">
+        <div className="quote-box">
+          <h1>"Push Yourself Because No One Else Is Going To Do It For You."</h1>
+        </div>
+      </div>
+
+      <div className="right-section">
+        {submitted ? (
+          <div className="success-container">
+            <Lottie animationData={successAnimation} loop={false} style={{ height: 250 }} />
+            <h2>Member Added Successfully!</h2>
+            <button onClick={handleAddAnother}>Add Another Member</button>
+          </div>
+        ) : (
+          <form className="glass-form" onSubmit={handleSubmit}>
+            <h2>Add Member</h2>
+
             <input
               type="text"
               name="name"
-              placeholder="Full Name"
+              placeholder="Name"
               value={formData.name}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="input-group">
             <input
               type="email"
               name="email"
-              placeholder="Email Address"
+              placeholder="Email"
               value={formData.email}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="input-group">
             <input
               type="tel"
               name="phone"
-              placeholder="Phone Number"
+              placeholder="Phone"
               value={formData.phone}
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="input-group">
-            <input
-              type="text"
+
+            <select
               name="membershipType"
-              placeholder="Membership Type (e.g., Premium, Standard)"
               value={formData.membershipType}
               onChange={handleChange}
               required
-            />
-          </div>
-          <div className="input-group">
+            >
+              <option value="">Membership Type</option>
+              <option value="Basic">Basic</option>
+              <option value="Bronze">Bronze</option>
+              <option value="Gold">Gold</option>
+              <option value="Platinum">Platinum</option>
+            </select>
+
+            {/* ✅ Membership Duration dropdown */}
+            <select name="membershipDuration" value={formData.membershipDuration} onChange={handleChange}>
+            <option value="">Select Duration</option>
+            <option value="30">1 month</option>
+            <option value="90">3 months</option>
+            <option value="180">6 months</option>
+            <option value="365">1 year</option>
+            </select>
+            
             <input
               type="date"
               name="joiningDate"
@@ -111,12 +136,12 @@ const AddMember = ({ onMemberAdded }) => {
               onChange={handleChange}
               required
             />
-          </div>
-          <button type="submit">Add Member</button>
-        </form>
-      </div>
 
-      <p className="gym-quote">"Train insane or remain the same"</p>
+
+            <button type="submit">Submit</button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

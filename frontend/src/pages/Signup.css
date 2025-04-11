@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+}
+
+.signup-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-image: url("https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=500&auto=format&fit=crop&q=60");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(10, 10, 20, 0.6);
+  z-index: 1;
+}
+
+.signup-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  text-align: center;
+  color: #fff;
+}
+
+.signup-lottie {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+
+.signup-form h2 {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.signup-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.signup-form input::placeholder {
+  color: #ddd;
+}
+
+.signup-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4b7bec;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 15px;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.signup-form button:hover {
+  background-color: #3a5fda;
+}
+
+.signup-form button:disabled {
+  background-color: #7a9af5;
+  cursor: not-allowed;
+}
+
+.switch-auth {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.switch-auth a {
+  color: #4b7bec;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-top: 10px;
+}
+.lottie-success-large {
+  height: 200px;
+  width: 200px;
+}

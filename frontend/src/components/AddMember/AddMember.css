@@ -1,167 +1,122 @@
-.gym-add-wrapper {
-  background: linear-gradient(to right, #dbe6f6, #c5796d);
-  min-height: 100vh;
-  padding: 40px 20px;
+.add-member-page {
   display: flex;
-  flex-direction: column;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+.left-section {
+  flex: 1;
+  background: url("../../assets/img/sven-mieke-MsCgmHuirDo-unsplash.jpg") center/cover no-repeat;
+  filter: brightness(0.8);
+  display: flex;
   align-items: center;
-  font-family: 'Segoe UI', sans-serif;
+  justify-content: center;
 }
 
-.gym-banner {
-  width: 100%;
-  max-width: 800px;
-  height: auto;
-  border-radius: 14px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+.quote-box {
+  background: rgba(255, 255, 255, 0.064);
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  text-align: center;
+  color: white;
+  max-width: 70%;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
-.form-container {
-  background: #fff;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  width: 100%;
-  animation: fadeIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.form-container h2 {
-  color: #2c3e50;
-  font-size: 28px;
-  margin-bottom: 20px;
-}
-
-.input-group {
-  margin-bottom: 20px;
+.right-section {
+  flex: 1;
+  background: linear-gradient(to right, #ffffffd8, #ffffffde);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
 }
 
-/* Icon Style (if still used) */
-.input-group span {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #666;
+.glass-form {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 450px;
 }
 
-/* Uniform Input Styles */
-.input-group input {
+.glass-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #222;
+}
+
+.glass-form input,
+.glass-form select {
   width: 100%;
-  padding: 12px 12px 12px 38px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-  font-family: 'Segoe UI', sans-serif;
-  font-weight: 400;
-  color: #333;
-  background-color: #fff;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.input-group input:focus {
-  border-color: #007bff;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
   outline: none;
 }
 
-/* Optional: Adjust for specific type=date if needed */
-.input-group input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5);
-  cursor: pointer;
-}
-
-/* Uniform Button Style */
-button {
-  background-color: #007bff;
-  color: white;
-  padding: 14px;
+.glass-form button {
+  width: 100%;
+  padding: 12px;
   border: none;
-  font-size: 16px;
-  border-radius: 10px;
+  border-radius: 8px;
+  background: #222;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s ease;
-  font-family: 'Segoe UI', sans-serif;
+  transition: 0.3s ease;
 }
 
-button:hover {
-  background-color: #0056b3;
+.glass-form button:hover {
+  background: #444;
 }
 
-.gym-quote {
-  margin-top: 30px;
-  font-style: italic;
-  color: #333;
-  font-size: 1.1rem;
-}
-/* AddMember.css */
-
-.gym-add-wrapper {
-  background: linear-gradient(to right, #dbe6f6, #c5796d);
-  min-height: 100vh;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.form-container {
-  background: #fff;
+.success-container {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  width: 100%;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 450px;
 }
 
-.input-group {
-  margin-bottom: 20px;
-  position: relative;
+.success-container h2 {
+  margin: 20px 0;
+  color: #222;
 }
 
-.input-group input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  background-color: #2d3436;
+.success-container button {
+  padding: 12px 20px;
+  background-color: #222;
   color: white;
-  padding: 14px;
   border: none;
-  font-size: 16px;
-  border-radius: 10px;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
+  transition: 0.3s ease;
 }
 
-button:hover {
-  background-color: #636e72;
+.success-container button:hover {
+  background-color: #444;
 }
-
-/* Mobile */
-@media screen and (max-width: 600px) {
-  .form-container {
-    padding: 25px;
-    border-radius: 14px;
-  }
+select {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgb(103, 103, 103);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 16px;
+  backdrop-filter: blur(8px);
+}
+input{
+  color: rgb(103, 103, 103);
+  
 }

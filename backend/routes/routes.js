@@ -17,6 +17,7 @@ router.get("/members", protect, async (req, res) => {
 
 // 🔍 Get members by any user ID (admin use)
 router.get("/members/by-user/:userId", protect, async (req, res) => {
+    console.log("📡 Route hit with userId:", req.params.userId);
     try {
         const members = await Member.find({ created_by: req.params.userId });
 
@@ -58,9 +59,9 @@ router.get("/members/:id", protect, async (req, res) => {
 // ➕ Add a new member
 router.post("/members", protect, async (req, res) => {
     try {
-        const { name, email, phone, membershipType, joiningDate, status } = req.body;
+        const { name, email, phone, membershipType, joiningDate, status,membershipDuration } = req.body;
 
-        if (!name || !email || !phone || !membershipType || !status) {
+        if (!name || !email || !phone || !membershipType || !status ||!membershipDuration) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -74,7 +75,8 @@ router.post("/members", protect, async (req, res) => {
             membershipType,
             joiningDate: joiningDate || new Date(),
             status,
-            created_by: req.user.id
+            created_by: req.user.id,
+            membershipDuration
         });
 
         await newMember.save();
