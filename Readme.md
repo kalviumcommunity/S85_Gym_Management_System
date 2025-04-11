@@ -1,5 +1,12 @@
 Project Title: Gym Management System
 
+
+# Gym Management System - cloudflare Deployment Update
+
+## Deployed site:-
+Netlify:-
+[DEPLOYED LINK](https://ironcorefit.netlify.app/)
+
 Project Overview: The Gym Management System is a web-based application designed to make the management of gym operations smooth and efficient. The system will enable the admin to add members, manage memberships, update membership plans, and track inactive members. It will also have the functionality to track and renew expiring memberships so that both the gym administrators and the members have a smooth experience.
 
 Key Features: 1.Admin Dashboard:
