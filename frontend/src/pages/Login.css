@@ -1,0 +1,147 @@
+/* Main Wrapper */
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Left Side */
+.auth-left-img {
+  flex: 1.2;
+  background: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1950&q=80') no-repeat center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-quote {
+  background: rgba(0, 0, 0, 0.749);
+  padding: 50px 30px;
+  border-radius: 16px;
+  text-align: center;
+  color: white;
+  max-width: 400px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.auth-quote h1 {
+  font-size: 2.8rem;
+  margin-bottom: 12px;
+}
+
+.auth-quote p {
+  font-size: 1.2rem;
+  color: #ddd;
+}
+
+/* Right Side */
+.auth-right-form {
+  flex: 1;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Lottie Animation */
+.lottie-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Form Styling */
+.auth-form {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 100%;
+  backdrop-filter: blur(10px);
+}
+
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #1e1e2f;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #1e1e2f;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-form button:hover {
+  background-color: #333c56;
+}
+
+.switch-auth {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.95rem;
+}
+
+.switch-auth a {
+  color: #1e1e2f;
+  text-decoration: underline;
+}
+
+.error-msg {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-wrapper {
+    flex-direction: column;
+  }
+
+  .auth-left-img {
+    height: 40vh;
+    flex: none;
+  }
+
+  .auth-quote {
+    padding: 30px 20px;
+  }
+
+  .auth-form {
+    margin-top: 20px;
+    padding: 30px;
+  }
+}
