@@ -7,7 +7,9 @@ import UpdateMember from "./components/UpdateMember/UpdateMember";
 import Home from "./components/Home/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import EntityDetail from "./components/EntityDetail"; // Import the EntityDetail page
 import "./App.css";
+import EntityList from "./components/EntityList";
 
 function App() {
   const [updateFlag, setUpdateFlag] = useState(false);
@@ -18,20 +20,21 @@ function App() {
 
   return (
     <>
-    <div className="page-content">
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/add" element={<AddMember onMemberAdded={refreshMembers} />} />
-        <Route path="/members" element={<MembersList key={updateFlag} />} />
-        <Route path="/update/:id" element={<UpdateMember />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
+      <div className="page-content">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/add" element={<AddMember onMemberAdded={refreshMembers} />} />
+          <Route path="/members" element={<MembersList key={updateFlag} />} />
+          <Route path="/update/:id" element={<UpdateMember />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/entity" element={<EntityDetail />} />
+        <Route path="/entity/:id" element={<EntityDetail />} /> {/* Dynamic route for entity details */}
+        </Routes>
       </div>
     </>
   );
 }
 
 export default App;
-// src="https://media.istockphoto.com/id/1925398083/photo/3d-render-gym-fitness-wellness-center.webp?a=1&b=1&s=612x612&w=0&k=20&c=IvMQVRJsAHi6pe1dPmk6n_Uq7ctB6UlQutOmLO8UbG4="
