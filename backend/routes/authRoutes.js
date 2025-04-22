@@ -16,6 +16,7 @@ router.post(
     body("password").isLength({ min: 6 })
   ],
   async (req, res) => {
+    console.log("Request Body:", req.body);  // Debugging log
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
@@ -30,7 +31,7 @@ router.post(
       user = new User({ name, email, password: hashedPassword });
       await user.save();
 
-      const token = jwt.sign({ id: user._id },process.env.JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
       res.status(201).json({ token });
     } catch (err) {
       res.status(500).json({ error: "Server error" });
@@ -58,12 +59,19 @@ router.post(
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-      const token = jwt.sign({ id: user._id },process.env.JWT_SECRET, { expiresIn: "1h" });
-      res.json({ token });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+      res.json({ token, message: "Login successful" });
     } catch (err) {
       res.status(500).json({ error: "Server error" });
     }
   }
 );
+
+
+// Logout - Clear the 'username' cookie
+router.post("/logout", (req, res) => {
+  res.clearCookie('username'); // Clear the cookie
+  res.status(200).json({ message: 'Logout successful' });
+});
 
 module.exports = router;
