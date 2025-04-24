@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Static frontend path
-app.use(express.static(path.join(__dirname, "frontend", "build")));
+// app.use(express.static(path.join(__dirname, "frontend", "build")));
 
 // Home route
 app.get("/", (req, res) => {
@@ -36,9 +36,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 
 // Wildcard route (for SPA)
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
-});
+// app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
+// });
 
 // Connect to DB and start server
 connectDatabase().then(() => {
