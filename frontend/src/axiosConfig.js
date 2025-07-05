@@ -1,8 +1,9 @@
 import axios from "axios";
+import { appConfig } from "./config/config.js";
 
 // Create an Axios instance with default config
 const api = axios.create({
-  baseURL: "http://localhost:3000/api", // Your backend API base URL
+  baseURL: appConfig.API_BASE_URL, // Using config from environment
   withCredentials: true, // Required for cookies (HTTP-only tokens)
   headers: {
     "Content-Type": "application/json",
@@ -13,6 +14,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // You can modify headers here (e.g., add Authorization token)
+    console.log(`Making request to: ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
