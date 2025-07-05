@@ -101,7 +101,15 @@ const CreateStaff = () => {
 
   const runFirebaseTest = async () => {
     try {
-      setDebugResult('Firebase test disabled for build compatibility');
+      setDebugResult('Running Firebase test...');
+      const { testFirebaseAuth } = await import('../../utils/firebaseTest');
+      const result = await testFirebaseAuth();
+      
+      if (result.success) {
+        setDebugResult(`✅ ${result.message}`);
+      } else {
+        setDebugResult(`❌ ${result.error}\nCode: ${result.code}`);
+      }
     } catch (error) {
       console.error('Debug test error:', error);
       setDebugResult(`❌ Debug test error: ${error.message}`);
