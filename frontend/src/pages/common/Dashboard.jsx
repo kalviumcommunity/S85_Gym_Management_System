@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   Calendar, 
@@ -9,25 +9,33 @@ import {
   Clock, 
   Award,
   DollarSign,
-  Target
+  Target,
+  User,
+  ShoppingBag,
+  Bell,
+  UserPlus,
+  ShoppingCart
 } from 'lucide-react';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { currentUser, userRole } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [stats, setStats] = useState({});
 
   useEffect(() => {
-    // Redirect based on role
-    if (userRole === 'member') {
-      navigate('/dashboard/member');
-    } else if (userRole === 'staff') {
-      navigate('/dashboard/staff');
-    } else if (userRole === 'admin') {
-      navigate('/dashboard/admin');
+    // Only redirect if we're on the main dashboard and user has a specific role
+    if (location.pathname === '/dashboard' && userRole) {
+      if (userRole === 'member') {
+        navigate('/dashboard/member');
+      } else if (userRole === 'staff') {
+        navigate('/dashboard/staff');
+      } else if (userRole === 'admin') {
+        navigate('/dashboard/admin');
+      }
     }
-  }, [userRole, navigate]);
+  }, [userRole, navigate, location.pathname]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -65,7 +73,12 @@ const Dashboard = () => {
   };
 
   if (!currentUser) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -77,7 +90,7 @@ const Dashboard = () => {
         </div>
         <div className="user-info">
           <img 
-            src={currentUser.photoURL || '/default-avatar.png'} 
+            src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=00CFFF&color=fff&size=100`} 
             alt="Profile" 
             className="user-avatar"
           />
@@ -108,10 +121,11 @@ const Dashboard = () => {
       <div className="quick-actions">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
+          {/* Member Actions */}
           {userRole === 'member' && (
             <>
               <button className="action-btn" onClick={() => navigate('/membership')}>
-                <Calendar size={20} />
+                <Award size={20} />
                 View Membership
               </button>
               <button className="action-btn" onClick={() => navigate('/payments')}>
@@ -119,34 +133,68 @@ const Dashboard = () => {
                 Pay Fees
               </button>
               <button className="action-btn" onClick={() => navigate('/profile')}>
-                <Users size={20} />
+                <User size={20} />
                 Edit Profile
+              </button>
+              <button className="action-btn" onClick={() => navigate('/shop')}>
+                <ShoppingBag size={20} />
+                Browse Shop
+              </button>
+              <button className="action-btn" onClick={() => navigate('/notifications')}>
+                <Bell size={20} />
+                Notifications
               </button>
             </>
           )}
           
-          {(userRole === 'staff' || userRole === 'admin') && (
+          {/* Staff Actions */}
+          {userRole === 'staff' && (
             <>
               <button className="action-btn" onClick={() => navigate('/members')}>
                 <Users size={20} />
                 View Members
               </button>
-              <button className="action-btn" onClick={() => navigate('/send-notification')}>
-                <Activity size={20} />
-                Send Notification
+              <button className="action-btn" onClick={() => navigate('/profile')}>
+                <User size={20} />
+                Edit Profile
+              </button>
+              <button className="action-btn" onClick={() => navigate('/notifications')}>
+                <Bell size={20} />
+                Notifications
+              </button>
+              <button className="action-btn" onClick={() => navigate('/shop')}>
+                <ShoppingBag size={20} />
+                Browse Shop
               </button>
             </>
           )}
           
+          {/* Admin Actions */}
           {userRole === 'admin' && (
             <>
+              <button className="action-btn" onClick={() => navigate('/staff')}>
+                <Users size={20} />
+                Manage Staff
+              </button>
+              <button className="action-btn" onClick={() => navigate('/create-staff')}>
+                <UserPlus size={20} />
+                Add Staff
+              </button>
               <button className="action-btn" onClick={() => navigate('/analytics')}>
                 <TrendingUp size={20} />
                 View Analytics
               </button>
               <button className="action-btn" onClick={() => navigate('/manage-shop')}>
-                <Award size={20} />
+                <ShoppingCart size={20} />
                 Manage Shop
+              </button>
+              <button className="action-btn" onClick={() => navigate('/profile')}>
+                <User size={20} />
+                Edit Profile
+              </button>
+              <button className="action-btn" onClick={() => navigate('/notifications')}>
+                <Bell size={20} />
+                Notifications
               </button>
             </>
           )}

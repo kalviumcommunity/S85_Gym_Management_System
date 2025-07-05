@@ -75,28 +75,6 @@ const MemberDashboard = () => {
               ))}
             </div>
           </div>
-
-          <div className="quick-actions">
-            <h2>Quick Actions</h2>
-            <div className="actions-list">
-              <button className="action-btn">
-                <Calendar size={20} />
-                Book a Class
-              </button>
-              <button className="action-btn">
-                <DollarSign size={20} />
-                Pay Fees
-              </button>
-              <button className="action-btn">
-                <Activity size={20} />
-                Log Workout
-              </button>
-              <button className="action-btn">
-                <Target size={20} />
-                Set Goals
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
