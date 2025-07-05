@@ -8,26 +8,23 @@ const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const config = require("./config/config");
 
 const adminRoutes = require("./routes/adminRoutes");
 const staffRoutes = require("./routes/staffRoutes");
 const memberRoutes = require("./routes/memberRoutes");
 
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser());
 
+// CORS configuration using config
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: config.CORS_ORIGINS,
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
-  }));
-
-
-
+}));
 
 // Home route
 app.get("/", (req, res) => {
@@ -42,15 +39,16 @@ app.use("/api", gymRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 
-
 app.use("/api/admin", adminRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/member", memberRoutes);
 
 // Connect to DB and start server
 connectDatabase().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    app.listen(config.PORT, () => {
+        console.log(`🚀 Server is running on port ${config.PORT}`);
+        console.log(`🌍 Environment: ${config.NODE_ENV}`);
+        console.log(`🔗 Frontend URL: ${config.FRONTEND_URL}`);
     });
 }).catch(err => {
     console.error("❌ Server failed to start:", err);
