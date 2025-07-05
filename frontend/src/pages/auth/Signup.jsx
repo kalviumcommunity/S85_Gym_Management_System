@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '../../context';
 import Lottie from 'lottie-react';
 
 import animation2 from '../../assets/lottie/Animation - 1744290292537.json';
