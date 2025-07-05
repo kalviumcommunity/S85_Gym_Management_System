@@ -1,15 +1,14 @@
-import { useContext } from 'react';
-import { AuthContext } from '../context/authContext';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-  const { authData } = useContext(AuthContext);
+  const { currentUser, userRole } = useAuth();
 
-  if (!authData) return <p>Loading...</p>;
+  if (!currentUser) return <p>Loading...</p>;
 
   return (
     <div>
-      <h1>Welcome to your Dashboard, {authData.name}</h1>
-      {authData.role === 'admin' ? (
+      <h1>Welcome to your Dashboard, {currentUser.displayName || 'User'}</h1>
+      {userRole === 'admin' ? (
         <div>
           <h2>Admin Panel</h2>
           <p>Manage users and settings here.</p>
