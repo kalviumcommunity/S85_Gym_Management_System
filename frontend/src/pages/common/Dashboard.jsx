@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   Calendar, 
-  TrendingUp, 
+  TrendingUp,
   Activity, 
   Clock, 
   Award,
@@ -16,6 +16,7 @@ import {
   UserPlus,
   ShoppingCart
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Only redirect if we're on the main dashboard and user has a specific role
@@ -37,6 +40,25 @@ const Dashboard = () => {
     }
   }, [userRole, navigate, location.pathname]);
 
+  useEffect(() => {
+    if (userRole) {
+      fetchDashboardStats();
+    }
+  }, [userRole]);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/stats/dashboard');
+      setStats(response.data);
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+      setError('Failed to load dashboard statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -48,24 +70,24 @@ const Dashboard = () => {
     switch (userRole) {
       case 'member':
         return [
-          { title: 'Membership Status', value: 'Active', icon: Award, color: '#00CFFF' },
-          { title: 'Days Remaining', value: '45 days', icon: Calendar, color: '#2ed573' },
-          { title: 'Last Workout', value: '2 days ago', icon: Activity, color: '#feca57' },
-          { title: 'Total Workouts', value: '12', icon: Target, color: '#a55eea' }
+          { title: 'Membership Status', value: stats.membershipStatus || 'Active', icon: Award, color: '#00CFFF' },
+          { title: 'Days Remaining', value: stats.daysRemaining || '45 days', icon: Calendar, color: '#2ed573' },
+          { title: 'Last Workout', value: stats.lastWorkout || '2 days ago', icon: Activity, color: '#feca57' },
+          { title: 'Total Workouts', value: stats.totalWorkouts?.toString() || '12', icon: Target, color: '#a55eea' }
         ];
       case 'staff':
         return [
-          { title: 'Total Members', value: '156', icon: Users, color: '#00CFFF' },
-          { title: 'Active Members', value: '142', icon: Activity, color: '#2ed573' },
-          { title: 'Pending Payments', value: '8', icon: DollarSign, color: '#feca57' },
-          { title: 'Today\'s Check-ins', value: '23', icon: Clock, color: '#a55eea' }
+          { title: 'Total Members', value: stats.totalMembers?.toString() || '0', icon: Users, color: '#00CFFF' },
+          { title: 'Active Members', value: stats.activeMembers?.toString() || '0', icon: Activity, color: '#2ed573' },
+          { title: 'Pending Payments', value: stats.pendingPayments?.toString() || '0', icon: DollarSign, color: '#feca57' },
+          { title: 'Today\'s Check-ins', value: stats.todayCheckins?.toString() || '0', icon: Clock, color: '#a55eea' }
         ];
       case 'admin':
         return [
-          { title: 'Total Revenue', value: '$45,230', icon: DollarSign, color: '#00CFFF' },
-          { title: 'Active Members', value: '156', icon: Users, color: '#2ed573' },
-          { title: 'Monthly Growth', value: '+12%', icon: TrendingUp, color: '#feca57' },
-          { title: 'Staff Members', value: '8', icon: Award, color: '#a55eea' }
+          { title: 'Total Revenue', value: `$${stats.monthlyRevenue?.toLocaleString() || '0'}`, icon: DollarSign, color: '#00CFFF' },
+          { title: 'Active Members', value: stats.activeMembers?.toString() || '0', icon: Users, color: '#2ed573' },
+          { title: 'Monthly Growth', value: stats.monthlyGrowth || '+12%', icon: TrendingUp, color: '#feca57' },
+          { title: 'Staff Members', value: stats.staffUsers?.toString() || '0', icon: Award, color: '#a55eea' }
         ];
       default:
         return [];
@@ -77,6 +99,28 @@ const Dashboard = () => {
       <div className="loading-container">
         <div className="loading-spinner"></div>
         <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchDashboardStats}>Retry</button>
+        </div>
       </div>
     );
   }

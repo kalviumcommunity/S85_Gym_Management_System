@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const { PendingSignup } = require("../models/gymSchemas");
 
 // Generate JWT Token
 const generateToken = (res, userId) => {
@@ -46,6 +47,40 @@ const signupUser = async (req, res) => {
   }
 };
 
+// Submit Pending Signup
+const submitPendingSignup = async (req, res) => {
+  const { name, email, phone, membershipType, membershipDuration } = req.body;
+
+  try {
+    // Check if email already exists in pending signups
+    const existingPending = await PendingSignup.findOne({ email });
+    if (existingPending) {
+      return res.status(400).json({ message: "A signup request with this email already exists" });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User with this email already exists" });
+    }
+
+    const pendingSignup = await PendingSignup.create({
+      name,
+      email,
+      phone,
+      membershipType,
+      membershipDuration,
+    });
+
+    res.status(201).json({
+      message: "Signup request submitted successfully. Please wait for admin approval.",
+      signup: pendingSignup,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to submit signup request", error: err.message });
+  }
+};
+
 // Login
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -78,6 +113,7 @@ const logoutUser = (req, res) => {
 
 module.exports = {
   signupUser,
+  submitPendingSignup,
   loginUser,
   logoutUser,
 };

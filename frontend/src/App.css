@@ -235,11 +235,11 @@ body {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .main-content {
     margin-left: 0 !important;
     width: 100% !important;
-    padding-top: 60px; /* Add padding to account for horizontal sidebar */
+    padding-top: 60px; /* Add padding to account for mobile header */
   }
   
   .pending-approval-content,

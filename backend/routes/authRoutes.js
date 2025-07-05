@@ -4,6 +4,7 @@ const { body } = require("express-validator");
 
 const {
   signupUser,
+  submitPendingSignup,
   loginUser,
   logoutUser,
 } = require("../controllers/authController");
@@ -19,6 +20,19 @@ router.post(
     body("password").isLength({ min: 6 }),
   ],
   signupUser
+);
+
+// Submit pending signup (for member registration)
+router.post(
+  "/pending-signup",
+  [
+    body("name").notEmpty(),
+    body("email").isEmail(),
+    body("phone").notEmpty(),
+    body("membershipType").notEmpty(),
+    body("membershipDuration").notEmpty(),
+  ],
+  submitPendingSignup
 );
 
 // Login

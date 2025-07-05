@@ -65,7 +65,7 @@ const Profile = () => {
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setIsEditing(false);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      setMessage({ type: 'error', text: `Failed to update profile: ${error.message}` });
     } finally {
       setLoading(false);
     }
@@ -102,28 +102,20 @@ const Profile = () => {
     return '#feca57';
   };
 
-  // Debug logging
-  console.log('Profile component - currentUser:', currentUser);
-  console.log('Profile component - displayName:', currentUser?.displayName);
-  console.log('Profile component - photoURL:', currentUser?.photoURL);
-
   // Helper function to get profile image source
   const getProfileImageSrc = () => {
     // If user has a photoURL, use it
     if (currentUser?.photoURL) {
-      console.log('Using photoURL:', currentUser.photoURL);
       return currentUser.photoURL;
     }
     
     // If user has a displayName, generate avatar
     if (currentUser?.displayName) {
       const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=200`;
-      console.log('Using generated avatar:', avatarUrl);
       return avatarUrl;
     }
     
     // Fallback to default avatar
-    console.log('Using default avatar');
     return '/default-avatar.svg';
   };
 
@@ -181,15 +173,7 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Debug section - remove this after fixing */}
-      <div style={{ background: '#f0f0f0', padding: '10px', margin: '10px 0', fontSize: '12px' }}>
-        <h4>Debug Info:</h4>
-        <p>currentUser exists: {currentUser ? 'Yes' : 'No'}</p>
-        <p>displayName: {currentUser?.displayName || 'null'}</p>
-        <p>photoURL: {currentUser?.photoURL || 'null'}</p>
-        <p>Image source: {getProfileImageSrc()}</p>
-        <p>User object keys: {currentUser ? Object.keys(currentUser).join(', ') : 'No user'}</p>
-      </div>
+
 
       <div className="profile-content">
         <div className="profile-grid">
@@ -200,21 +184,10 @@ const Profile = () => {
                 src={getProfileImageSrc()}
                 alt="Profile" 
                 onError={(e) => {
-                  console.error('Profile image failed to load:', e.target.src);
                   e.target.src = '/default-avatar.svg';
                 }}
-                onLoad={(e) => {
-                  console.log('Profile image loaded successfully:', e.target.src);
-                }}
               />
-              {/* Test image to verify if images work at all */}
-              <img 
-                src="/default-avatar.svg" 
-                alt="Test" 
-                style={{ width: '20px', height: '20px', position: 'absolute', top: '0', right: '0' }}
-                onError={(e) => console.error('Test image failed to load')}
-                onLoad={(e) => console.log('Test image loaded successfully')}
-              />
+
               {isEditing && (
                 <button className="camera-btn">
                   <Camera size={20} />

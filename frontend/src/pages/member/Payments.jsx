@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Receipt
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './Payments.css';
 
 const Payments = () => {
@@ -26,97 +27,123 @@ const Payments = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [showAddMethodModal, setShowAddMethodModal] = useState(false);
+  const [error, setError] = useState('');
 
-  // Mock payments data - in real app, this would come from Firestore
   useEffect(() => {
-    const mockPayments = [
-      {
-        id: '1',
-        type: 'membership',
-        amount: 50.00,
-        status: 'completed',
-        date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
-        description: 'Monthly Membership Fee',
-        paymentMethod: 'credit_card',
-        last4: '1234',
-        invoiceNumber: 'INV-2024-001',
-        category: 'membership'
-      },
-      {
-        id: '2',
-        type: 'personal_training',
-        amount: 75.00,
-        status: 'completed',
-        date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-        description: 'Personal Training Session',
-        paymentMethod: 'credit_card',
-        last4: '1234',
-        invoiceNumber: 'INV-2024-002',
-        category: 'services'
-      },
-      {
-        id: '3',
-        type: 'shop',
-        amount: 29.99,
-        status: 'completed',
-        date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000), // 45 days ago
-        description: 'Resistance Bands Set',
-        paymentMethod: 'credit_card',
-        last4: '1234',
-        invoiceNumber: 'INV-2024-003',
-        category: 'shop'
-      },
-      {
-        id: '4',
-        type: 'membership',
-        amount: 50.00,
-        status: 'pending',
-        date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-        description: 'Monthly Membership Fee',
-        paymentMethod: 'credit_card',
-        last4: '1234',
-        invoiceNumber: 'INV-2024-004',
-        category: 'membership'
-      },
-      {
-        id: '5',
-        type: 'supplements',
-        amount: 45.99,
-        status: 'failed',
-        date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
-        description: 'Protein Powder',
-        paymentMethod: 'credit_card',
-        last4: '1234',
-        invoiceNumber: 'INV-2024-005',
-        category: 'shop'
-      }
-    ];
-
-    const mockPaymentMethods = [
-      {
-        id: '1',
-        type: 'credit_card',
-        name: 'Visa ending in 1234',
-        last4: '1234',
-        expiry: '12/25',
-        isDefault: true,
-        brand: 'visa'
-      },
-      {
-        id: '2',
-        type: 'credit_card',
-        name: 'Mastercard ending in 5678',
-        last4: '5678',
-        expiry: '08/26',
-        isDefault: false,
-        brand: 'mastercard'
-      }
-    ];
-
-    setPayments(mockPayments);
-    setPaymentMethods(mockPaymentMethods);
-    setLoading(false);
+    fetchPayments();
+    fetchPaymentMethods();
   }, []);
+
+  const fetchPayments = async () => {
+    try {
+      setLoading(true);
+      // For now, we'll use mock data since we don't have a payments API yet
+      // In a real app, this would be: const response = await api.get('/payments');
+      
+      // Generate realistic payment data based on user's membership
+      const mockPayments = [
+        {
+          id: '1',
+          type: 'membership',
+          amount: 50.00,
+          status: 'completed',
+          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
+          description: 'Monthly Membership Fee',
+          paymentMethod: 'credit_card',
+          last4: '1234',
+          invoiceNumber: 'INV-2024-001',
+          category: 'membership'
+        },
+        {
+          id: '2',
+          type: 'personal_training',
+          amount: 75.00,
+          status: 'completed',
+          date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+          description: 'Personal Training Session',
+          paymentMethod: 'credit_card',
+          last4: '1234',
+          invoiceNumber: 'INV-2024-002',
+          category: 'services'
+        },
+        {
+          id: '3',
+          type: 'shop',
+          amount: 29.99,
+          status: 'completed',
+          date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000), // 45 days ago
+          description: 'Resistance Bands Set',
+          paymentMethod: 'credit_card',
+          last4: '1234',
+          invoiceNumber: 'INV-2024-003',
+          category: 'shop'
+        },
+        {
+          id: '4',
+          type: 'membership',
+          amount: 50.00,
+          status: 'pending',
+          date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+          description: 'Monthly Membership Fee',
+          paymentMethod: 'credit_card',
+          last4: '1234',
+          invoiceNumber: 'INV-2024-004',
+          category: 'membership'
+        },
+        {
+          id: '5',
+          type: 'supplements',
+          amount: 45.99,
+          status: 'failed',
+          date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
+          description: 'Protein Powder',
+          paymentMethod: 'credit_card',
+          last4: '1234',
+          invoiceNumber: 'INV-2024-005',
+          category: 'shop'
+        }
+      ];
+
+      setPayments(mockPayments);
+    } catch (err) {
+      console.error('Error fetching payments:', err);
+      setError('Failed to load payment history');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPaymentMethods = async () => {
+    try {
+      // For now, we'll use mock data since we don't have a payment methods API yet
+      // In a real app, this would be: const response = await api.get('/payment-methods');
+      
+      const mockPaymentMethods = [
+        {
+          id: '1',
+          type: 'credit_card',
+          name: 'Visa ending in 1234',
+          last4: '1234',
+          expiry: '12/25',
+          isDefault: true,
+          brand: 'visa'
+        },
+        {
+          id: '2',
+          type: 'credit_card',
+          name: 'Mastercard ending in 5678',
+          last4: '5678',
+          expiry: '08/26',
+          isDefault: false,
+          brand: 'mastercard'
+        }
+      ];
+
+      setPaymentMethods(mockPaymentMethods);
+    } catch (err) {
+      console.error('Error fetching payment methods:', err);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -195,8 +222,22 @@ const Payments = () => {
   if (loading) {
     return (
       <div className="payments-container">
-        <div className="loading-spinner"></div>
-        <p>Loading payment history...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading payments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="payments-container">
+        <div className="error-container">
+          <AlertCircle size={48} />
+          <p>{error}</p>
+          <button onClick={fetchPayments}>Retry</button>
+        </div>
       </div>
     );
   }
@@ -206,153 +247,91 @@ const Payments = () => {
       <div className="payments-header">
         <div className="header-content">
           <h1>Payment History</h1>
-          <p>Manage your billing information and view payment history</p>
+          <p>Track your payments and manage billing information</p>
         </div>
         <div className="header-actions">
-          <button className="action-btn" onClick={addPaymentMethod}>
-            <Plus size={20} />
+          <button className="action-btn" onClick={() => setShowAddMethodModal(true)}>
+            <Plus size={16} />
             Add Payment Method
           </button>
         </div>
       </div>
 
+      <div className="payments-summary">
+        <div className="summary-card">
+          <div className="summary-icon">
+            <DollarSign size={24} />
+          </div>
+          <div className="summary-content">
+            <h3>Total Spent</h3>
+            <p className="summary-value">${getTotalSpent().toFixed(2)}</p>
+          </div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            <Clock size={24} />
+          </div>
+          <div className="summary-content">
+            <h3>Pending Amount</h3>
+            <p className="summary-value">${getPendingAmount().toFixed(2)}</p>
+          </div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-icon">
+            <CreditCard size={24} />
+          </div>
+          <div className="summary-content">
+            <h3>Payment Methods</h3>
+            <p className="summary-value">{paymentMethods.length}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="payments-content">
-        {/* Payment Summary */}
-        <div className="payment-summary">
-          <div className="summary-card">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-content">
-              <h3>Total Spent</h3>
-              <p className="summary-value">${getTotalSpent().toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="summary-card">
-            <div className="summary-icon">
-              <Clock size={24} />
-            </div>
-            <div className="summary-content">
-              <h3>Pending Payments</h3>
-              <p className="summary-value">${getPendingAmount().toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="summary-card">
-            <div className="summary-icon">
-              <CreditCard size={24} />
-            </div>
-            <div className="summary-content">
-              <h3>Payment Methods</h3>
-              <p className="summary-value">{paymentMethods.length}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Methods */}
-        <div className="payment-methods-section">
-          <h2>Payment Methods</h2>
-          <div className="methods-grid">
-            {paymentMethods.map(method => (
-              <div key={method.id} className="method-card">
-                <div className="method-info">
-                  <div className="method-icon">
-                    <CreditCard size={20} />
-                  </div>
-                  <div className="method-details">
-                    <h3>{method.name}</h3>
-                    <p>Expires {method.expiry}</p>
-                    {method.isDefault && (
-                      <span className="default-badge">Default</span>
-                    )}
-                  </div>
-                </div>
-                <div className="method-actions">
-                  {!method.isDefault && (
-                    <button 
-                      className="action-btn small"
-                      onClick={() => setDefaultMethod(method.id)}
-                    >
-                      Set Default
-                    </button>
-                  )}
-                  <button 
-                    className="action-btn small"
-                    onClick={() => {/* Edit method */}}
-                  >
-                    <Edit3 size={16} />
-                  </button>
-                  <button 
-                    className="action-btn small danger"
-                    onClick={() => removePaymentMethod(method.id)}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Payment History */}
-        <div className="payment-history-section">
-          <h2>Payment History</h2>
+        <div className="payments-list">
+          <h2>Recent Payments</h2>
           <div className="payments-table">
             <div className="table-header">
-              <div className="header-cell">Date</div>
-              <div className="header-cell">Description</div>
-              <div className="header-cell">Category</div>
+              <div className="header-cell">Payment</div>
               <div className="header-cell">Amount</div>
               <div className="header-cell">Status</div>
+              <div className="header-cell">Date</div>
               <div className="header-cell">Actions</div>
             </div>
-            
             <div className="table-body">
-              {payments.map(payment => (
-                <div key={payment.id} className="table-row">
-                  <div className="table-cell">
-                    <span className="date">{formatDate(payment.date)}</span>
-                  </div>
-                  <div className="table-cell">
-                    <div className="description">
+              {payments.map((payment) => (
+                <div key={payment.id} className="payment-row">
+                  <div className="payment-info">
+                    <div className="payment-icon">
+                      {getCategoryIcon(payment.category)}
+                    </div>
+                    <div className="payment-details">
                       <h4>{payment.description}</h4>
                       <p>Invoice: {payment.invoiceNumber}</p>
                     </div>
                   </div>
-                  <div className="table-cell">
-                    <div className="category">
-                      {getCategoryIcon(payment.category)}
-                      <span>{payment.category}</span>
-                    </div>
-                  </div>
-                  <div className="table-cell">
+                  <div className="payment-amount">
                     <span className="amount">${payment.amount.toFixed(2)}</span>
                   </div>
-                  <div className="table-cell">
-                    <div 
-                      className="status-badge"
-                      style={{ '--status-color': getStatusColor(payment.status) }}
+                  <div className="payment-status">
+                    <span 
+                      className="status-badge" 
+                      style={{ backgroundColor: getStatusColor(payment.status) }}
                     >
                       {getStatusIcon(payment.status)}
-                      <span>{payment.status}</span>
-                    </div>
+                      {payment.status}
+                    </span>
                   </div>
-                  <div className="table-cell">
-                    <div className="row-actions">
-                      <button 
-                        className="action-btn small"
-                        onClick={() => handlePaymentDetails(payment)}
-                        title="View Details"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <button 
-                        className="action-btn small"
-                        onClick={() => downloadInvoice(payment)}
-                        title="Download Invoice"
-                      >
-                        <Download size={16} />
-                      </button>
-                    </div>
+                  <div className="payment-date">
+                    {formatDate(payment.date)}
+                  </div>
+                  <div className="payment-actions">
+                    <button className="action-btn" onClick={() => handlePaymentDetails(payment)}>
+                      <Eye size={16} />
+                    </button>
+                    <button className="action-btn">
+                      <Download size={16} />
+                    </button>
                   </div>
                 </div>
               ))}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { UserPlus, Mail, User, Lock, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, Mail, User, Lock, Eye, EyeOff, Bug, TestTube } from 'lucide-react';
 import './AdminPages.css';
 
 const CreateStaff = () => {
@@ -16,6 +16,8 @@ const CreateStaff = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugResult, setDebugResult] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -77,9 +79,53 @@ const CreateStaff = () => {
       });
     } catch (error) {
       console.error('Error creating staff account:', error);
-      setError(error.message || 'Failed to create staff account. Please try again.');
+      
+      // Handle different types of errors
+      if (error.message.includes('email already exists')) {
+        setError('This email is already registered. Please use a different email address.');
+      } else if (error.message.includes('authentication is not enabled')) {
+        setError('Email/password authentication is not enabled. Please contact the system administrator.');
+      } else if (error.message.includes('weak password')) {
+        setError('Password is too weak. Please choose a stronger password with at least 6 characters.');
+      } else if (error.message.includes('valid email')) {
+        setError('Please enter a valid email address.');
+      } else if (error.message.includes('network')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else {
+        setError(error.message || 'Failed to create staff account. Please try again.');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const runFirebaseTest = async () => {
+    try {
+      setDebugResult('Running Firebase test...');
+      
+      // Import the test function dynamically
+      const { testFirebaseAuth, checkFirebaseConfig } = await import('../../utils/firebaseTest');
+      
+      // Check config first
+      const configResult = checkFirebaseConfig();
+      console.log('Config check result:', configResult);
+      
+      if (!configResult.valid) {
+        setDebugResult(`❌ Configuration issues: ${configResult.issues.join(', ')}`);
+        return;
+      }
+      
+      // Run auth test
+      const result = await testFirebaseAuth();
+      
+      if (result.success) {
+        setDebugResult('✅ All Firebase tests passed! Authentication is working correctly.');
+      } else {
+        setDebugResult(`❌ Test failed: ${result.error} (Code: ${result.code})`);
+      }
+    } catch (error) {
+      console.error('Debug test error:', error);
+      setDebugResult(`❌ Debug test error: ${error.message}`);
     }
   };
 
@@ -198,13 +244,57 @@ const CreateStaff = () => {
             <div className="form-actions">
               <button
                 type="submit"
-                className="submit-btn"
+                className="btn-primary"
                 disabled={loading}
               >
                 {loading ? 'Creating Account...' : 'Create Staff Account'}
               </button>
             </div>
           </form>
+
+          {/* Debug Section */}
+          <div className="debug-section">
+            <button
+              type="button"
+              className="debug-toggle"
+              onClick={() => setShowDebug(!showDebug)}
+            >
+              <Bug size={20} />
+              {showDebug ? 'Hide Debug' : 'Show Debug'}
+            </button>
+            
+            {showDebug && (
+              <div className="debug-panel">
+                <h3>Firebase Debug Tools</h3>
+                <p>Use these tools to test and diagnose Firebase authentication issues.</p>
+                
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={runFirebaseTest}
+                >
+                  <TestTube size={20} />
+                  Test Firebase Authentication
+                </button>
+                
+                {debugResult && (
+                  <div className="debug-result">
+                    <pre>{debugResult}</pre>
+                  </div>
+                )}
+                
+                <div className="debug-info">
+                  <h4>Common Issues:</h4>
+                  <ul>
+                    <li><strong>auth/operation-not-allowed:</strong> Enable Email/Password auth in Firebase Console</li>
+                    <li><strong>auth/email-already-in-use:</strong> Use a different email address</li>
+                    <li><strong>permission-denied:</strong> Check Firestore security rules</li>
+                    <li><strong>network errors:</strong> Check internet connection</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="form-info">
             <h3>What happens next?</h3>

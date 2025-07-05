@@ -13,8 +13,11 @@ import {
   X,
   Package,
   DollarSign,
-  Truck
+  Truck,
+  Tag,
+  TrendingUp
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './Shop.css';
 
 const Shop = () => {
@@ -22,138 +25,152 @@ const Shop = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('featured');
   const [showCart, setShowCart] = useState(false);
   const [wishlist, setWishlist] = useState([]);
 
-  // Mock products data - in real app, this would come from Firestore
   useEffect(() => {
-    const mockProducts = [
-      {
-        id: '1',
-        name: 'Premium Protein Powder',
-        category: 'supplements',
-        price: 45.99,
-        originalPrice: 59.99,
-        rating: 4.8,
-        reviews: 124,
-        image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop',
-        description: 'High-quality whey protein isolate with 25g protein per serving.',
-        inStock: true,
-        stockCount: 15,
-        tags: ['protein', 'muscle-building', 'recovery']
-      },
-      {
-        id: '2',
-        name: 'Resistance Bands Set',
-        category: 'equipment',
-        price: 29.99,
-        originalPrice: 39.99,
-        rating: 4.6,
-        reviews: 89,
-        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
-        description: 'Complete set of 5 resistance bands for home workouts.',
-        inStock: true,
-        stockCount: 23,
-        tags: ['resistance', 'home-workout', 'strength']
-      },
-      {
-        id: '3',
-        name: 'Gym Water Bottle',
-        category: 'accessories',
-        price: 19.99,
-        originalPrice: 24.99,
-        rating: 4.9,
-        reviews: 256,
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
-        description: 'Insulated 32oz water bottle with time markers.',
-        inStock: true,
-        stockCount: 42,
-        tags: ['hydration', 'insulated', 'motivation']
-      },
-      {
-        id: '4',
-        name: 'Yoga Mat Premium',
-        category: 'equipment',
-        price: 34.99,
-        originalPrice: 44.99,
-        rating: 4.7,
-        reviews: 167,
-        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop',
-        description: 'Non-slip yoga mat with alignment lines.',
-        inStock: true,
-        stockCount: 18,
-        tags: ['yoga', 'non-slip', 'alignment']
-      },
-      {
-        id: '5',
-        name: 'BCAA Amino Acids',
-        category: 'supplements',
-        price: 32.99,
-        originalPrice: 42.99,
-        rating: 4.5,
-        reviews: 93,
-        image: 'https://images.unsplash.com/photo-1584017911761-bea6a6d096b1?w=400&h=400&fit=crop',
-        description: 'Branched-chain amino acids for muscle recovery.',
-        inStock: true,
-        stockCount: 27,
-        tags: ['bcaa', 'recovery', 'amino-acids']
-      },
-      {
-        id: '6',
-        name: 'Gym Towel Set',
-        category: 'accessories',
-        price: 24.99,
-        originalPrice: 29.99,
-        rating: 4.4,
-        reviews: 78,
-        image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=400&h=400&fit=crop',
-        description: 'Set of 3 microfiber gym towels.',
-        inStock: true,
-        stockCount: 35,
-        tags: ['towels', 'microfiber', 'hygiene']
-      },
-      {
-        id: '7',
-        name: 'Dumbbell Set',
-        category: 'equipment',
-        price: 89.99,
-        originalPrice: 119.99,
-        rating: 4.8,
-        reviews: 203,
-        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
-        description: 'Adjustable dumbbell set 5-50 lbs.',
-        inStock: false,
-        stockCount: 0,
-        tags: ['dumbbells', 'adjustable', 'strength']
-      },
-      {
-        id: '8',
-        name: 'Pre-Workout Energy',
-        category: 'supplements',
-        price: 38.99,
-        originalPrice: 48.99,
-        rating: 4.6,
-        reviews: 145,
-        image: 'https://images.unsplash.com/photo-1584017911761-bea6a6d096b1?w=400&h=400&fit=crop',
-        description: 'High-energy pre-workout formula.',
-        inStock: true,
-        stockCount: 12,
-        tags: ['pre-workout', 'energy', 'performance']
-      }
-    ];
-
-    setProducts(mockProducts);
-    setLoading(false);
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // For now, we'll use mock data since we don't have a shop API yet
+      // In a real app, this would be: const response = await api.get('/shop/products');
+      
+      const mockProducts = [
+        {
+          id: '1',
+          name: 'Premium Protein Powder',
+          category: 'supplements',
+          price: 45.99,
+          originalPrice: 59.99,
+          rating: 4.8,
+          reviews: 124,
+          image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop',
+          description: 'High-quality whey protein isolate with 25g protein per serving.',
+          inStock: true,
+          stockCount: 15,
+          tags: ['protein', 'muscle-building', 'recovery']
+        },
+        {
+          id: '2',
+          name: 'Resistance Bands Set',
+          category: 'equipment',
+          price: 29.99,
+          originalPrice: 39.99,
+          rating: 4.6,
+          reviews: 89,
+          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+          description: 'Complete set of 5 resistance bands for home workouts.',
+          inStock: true,
+          stockCount: 23,
+          tags: ['resistance', 'home-workout', 'strength']
+        },
+        {
+          id: '3',
+          name: 'Gym Water Bottle',
+          category: 'accessories',
+          price: 19.99,
+          originalPrice: 24.99,
+          rating: 4.9,
+          reviews: 256,
+          image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+          description: 'Insulated 32oz water bottle with time markers.',
+          inStock: true,
+          stockCount: 42,
+          tags: ['hydration', 'insulated', 'motivation']
+        },
+        {
+          id: '4',
+          name: 'Yoga Mat Premium',
+          category: 'equipment',
+          price: 34.99,
+          originalPrice: 44.99,
+          rating: 4.7,
+          reviews: 167,
+          image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop',
+          description: 'Non-slip yoga mat with alignment lines.',
+          inStock: true,
+          stockCount: 18,
+          tags: ['yoga', 'non-slip', 'alignment']
+        },
+        {
+          id: '5',
+          name: 'BCAA Amino Acids',
+          category: 'supplements',
+          price: 32.99,
+          originalPrice: 42.99,
+          rating: 4.5,
+          reviews: 93,
+          image: 'https://images.unsplash.com/photo-1584017911761-bea6a6d096b1?w=400&h=400&fit=crop',
+          description: 'Branched-chain amino acids for muscle recovery.',
+          inStock: true,
+          stockCount: 27,
+          tags: ['bcaa', 'recovery', 'amino-acids']
+        },
+        {
+          id: '6',
+          name: 'Gym Towel Set',
+          category: 'accessories',
+          price: 24.99,
+          originalPrice: 29.99,
+          rating: 4.4,
+          reviews: 78,
+          image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=400&h=400&fit=crop',
+          description: 'Set of 3 microfiber gym towels.',
+          inStock: true,
+          stockCount: 35,
+          tags: ['towels', 'microfiber', 'hygiene']
+        },
+        {
+          id: '7',
+          name: 'Dumbbell Set',
+          category: 'equipment',
+          price: 89.99,
+          originalPrice: 119.99,
+          rating: 4.8,
+          reviews: 203,
+          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+          description: 'Adjustable dumbbell set 5-50 lbs.',
+          inStock: false,
+          stockCount: 0,
+          tags: ['dumbbells', 'adjustable', 'strength']
+        },
+        {
+          id: '8',
+          name: 'Pre-Workout Energy',
+          category: 'supplements',
+          price: 38.99,
+          originalPrice: 48.99,
+          rating: 4.6,
+          reviews: 145,
+          image: 'https://images.unsplash.com/photo-1584017911761-bea6a6d096b1?w=400&h=400&fit=crop',
+          description: 'High-energy pre-workout formula.',
+          inStock: true,
+          stockCount: 12,
+          tags: ['pre-workout', 'energy', 'performance']
+        }
+      ];
+
+      setProducts(mockProducts);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to load products');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [
     { id: 'all', name: 'All Products', icon: Package },
-    { id: 'supplements', name: 'Supplements', icon: Package },
-    { id: 'equipment', name: 'Equipment', icon: Package },
-    { id: 'accessories', name: 'Accessories', icon: Package }
+    { id: 'supplements', name: 'Supplements', icon: TrendingUp },
+    { id: 'equipment', name: 'Equipment', icon: ShoppingBag },
+    { id: 'accessories', name: 'Accessories', icon: Tag }
   ];
 
   const addToCart = (product) => {
@@ -205,12 +222,10 @@ const Shop = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    return matchesCategory && matchesSearch;
+                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -221,17 +236,35 @@ const Shop = () => {
         return b.price - a.price;
       case 'rating':
         return b.rating - a.rating;
-      case 'name':
+      case 'newest':
+        return new Date(b.createdAt) - new Date(a.createdAt);
       default:
-        return a.name.localeCompare(b.name);
+        return 0;
     }
   });
+
+  const getDiscountPercentage = (originalPrice, currentPrice) => {
+    return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+  };
 
   if (loading) {
     return (
       <div className="shop-container">
-        <div className="loading-spinner"></div>
-        <p>Loading shop...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="shop-container">
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchProducts}>Retry</button>
+        </div>
       </div>
     );
   }
@@ -291,10 +324,11 @@ const Shop = () => {
                 value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="name">Sort by Name</option>
+                <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="rating">Sort by Rating</option>
+                <option value="rating">Highest Rated</option>
+                <option value="newest">Newest</option>
               </select>
             </div>
           </div>
@@ -337,7 +371,7 @@ const Shop = () => {
                   )}
                   {product.originalPrice > product.price && (
                     <div className="discount-badge">
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                      -{getDiscountPercentage(product.originalPrice, product.price)}%
                     </div>
                   )}
                 </div>
@@ -349,12 +383,12 @@ const Shop = () => {
                   
                   <div className="product-rating">
                     <div className="stars">
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <Star 
-                          key={star}
-                          size={16}
-                          fill={star <= Math.floor(product.rating) ? '#feca57' : 'none'}
-                          color="#feca57"
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={14}
+                          fill={i < Math.floor(product.rating) ? '#ffd700' : 'none'}
+                          color="#ffd700"
                         />
                       ))}
                     </div>
