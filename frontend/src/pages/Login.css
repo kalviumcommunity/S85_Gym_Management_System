@@ -124,7 +124,19 @@
   margin-bottom: 10px;
   text-align: center;
 }
+.logout-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
 
+.logout-btn:hover {
+  color: #f59e0b;
+}
 /* Responsive */
 @media (max-width: 768px) {
   .auth-wrapper {

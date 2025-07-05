@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import Lottie from "lottie-react";
-import waveBackground from "../assets/lottie/wave.json"; // adjust path as needed
-import "./Login.css";
+import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/authContext';
+import api from '../axiosConfig';
+import Lottie from 'lottie-react';
+import waveBackground from '../assets/lottie/wave.json';
+import './Login.css';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const { setAuthData } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,19 +19,28 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/login", formData);
-      localStorage.setItem("token", res.data.token);
-      console.log(res.data);
-      navigate("/");
+      const res = await api.post('/auth/login', formData);
+      console.log(res.data); // Log the response to check its content
+      const { token, user } = res.data;
+      if (!token || !user) {
+        setError('Invalid credentials.');
+        return;
+      }
+      localStorage.setItem('authToken', token);
+      setAuthData(user);
+      if (user.role === 'admin' || user.role === 'staff') {
+        navigate('/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
-      console.error(err);
-      setError("Invalid credentials.");
+      console.error(err); // Log the error to get more details
+      setError('Invalid credentials.');
     }
   };
 
   return (
     <div className="auth-wrapper">
-      {/* LEFT SIDE with image and quote */}
       <div className="auth-left-img">
         <div className="auth-quote">
           <h1>Welcome Back!</h1>
@@ -37,7 +48,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE with form */}
       <div className="auth-right-form">
         <div className="lottie-bg">
           <Lottie animationData={waveBackground} loop autoPlay />
@@ -63,9 +73,6 @@ const Login = () => {
           />
           <button type="submit">Sign In</button>
           {error && <p className="error-msg">{error}</p>}
-          <p className="switch-auth">
-            Don’t have an account? <a href="/signup">Sign up</a>
-          </p>
         </form>
       </div>
     </div>

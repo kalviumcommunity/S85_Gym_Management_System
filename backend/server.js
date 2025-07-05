@@ -9,18 +9,25 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 
+const adminRoutes = require("./routes/adminRoutes");
+const staffRoutes = require("./routes/staffRoutes");
+const memberRoutes = require("./routes/memberRoutes");
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(cors({
     origin: "http://localhost:5173",
-    credentials: true
-}));
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 
-// Static frontend path
-// app.use(express.static(path.join(__dirname, "frontend", "build")));
+
+
 
 // Home route
 app.get("/", (req, res) => {
@@ -35,10 +42,10 @@ app.use("/api", gymRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 
-// Wildcard route (for SPA)
-// app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
-// });
+
+app.use("/api/admin", adminRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/member", memberRoutes);
 
 // Connect to DB and start server
 connectDatabase().then(() => {

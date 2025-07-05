@@ -2,10 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const { body } = require("express-validator");
 
-const { signupUser, loginUser, logoutUser } = require("../controllers/authController");
+const {
+  signupUser,
+  loginUser,
+  logoutUser,
+} = require("../controllers/authController");
 
 const router = express.Router();
 
+// Signup (optionally accept role from admin panel)
 router.post(
   "/signup",
   [
@@ -16,6 +21,7 @@ router.post(
   signupUser
 );
 
+// Login
 router.post(
   "/login",
   [
@@ -25,6 +31,7 @@ router.post(
   loginUser
 );
 
+// Logout
 router.post("/logout", logoutUser);
 
 module.exports = router;

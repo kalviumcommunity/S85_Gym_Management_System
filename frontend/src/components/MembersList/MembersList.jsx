@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./MembersList.css";
+import api from "../../axiosConfig"; // Ensure correct path
 
 const MembersList = () => {
   const [members, setMembers] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,25 +17,22 @@ const MembersList = () => {
 
   const fetchAllMembers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:3000/api/members/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      console.log("Fetching members..."); // Debug
+      const res = await api.get("/members/all");
+      console.log("API Response:", res.data); // Debug
       setMembers(res.data);
     } catch (err) {
       console.error("Error fetching all members:", err);
+      setError("Failed to load members");
     }
   };
-
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:3000/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/users"); // Using the configured api
       setUsers(res.data);
     } catch (err) {
       console.error("Error fetching users:", err);
+      setError("Failed to load users");
     }
   };
 
@@ -43,33 +41,25 @@ const MembersList = () => {
     setSelectedUser(selectedUserId);
 
     try {
-      const token = localStorage.getItem("token");
-
       if (selectedUserId === "") {
         fetchAllMembers();
       } else {
-        const res = await axios.get(
-          `http://localhost:3000/api/members/by-user/${selectedUserId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await api.get(`/members/by-user/${selectedUserId}`);
         setMembers(res.data);
       }
     } catch (error) {
       console.error("Error filtering members:", error);
+      setError("Failed to filter members");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/api/members/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/members/${id}`);
       setMembers((prev) => prev.filter((member) => member._id !== id));
     } catch (error) {
       console.error("Error deleting member:", error);
+      setError("Failed to delete member");
     }
   };
 
