@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context';
+import { useAuth } from '../../context/AuthContext';
 import { UserPlus, Mail, User, Lock, Eye, EyeOff, Bug, TestTube } from 'lucide-react';
 import './AdminPages.css';
 
@@ -102,26 +102,13 @@ const CreateStaff = () => {
   const runFirebaseTest = async () => {
     try {
       setDebugResult('Running Firebase test...');
-      
-      // Import the test function dynamically
-      const { testFirebaseAuth, checkFirebaseConfig } = await import('../../utils/firebaseTest');
-      
-      // Check config first
-      const configResult = checkFirebaseConfig();
-      console.log('Config check result:', configResult);
-      
-      if (!configResult.valid) {
-        setDebugResult(`❌ Configuration issues: ${configResult.issues.join(', ')}`);
-        return;
-      }
-      
-      // Run auth test
+      const { testFirebaseAuth } = await import('../../utils/firebaseTest');
       const result = await testFirebaseAuth();
       
       if (result.success) {
-        setDebugResult('✅ All Firebase tests passed! Authentication is working correctly.');
+        setDebugResult(`✅ ${result.message}`);
       } else {
-        setDebugResult(`❌ Test failed: ${result.error} (Code: ${result.code})`);
+        setDebugResult(`❌ ${result.error}\nCode: ${result.code}`);
       }
     } catch (error) {
       console.error('Debug test error:', error);

@@ -1,10 +1,9 @@
-import { useContext } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Route, Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/authContext';
 
 const PrivateRoute = ({ component: Component, allowedRoles, ...rest }) => {
-  const { authData } = useContext(AuthContext);
-  const isAuthenticated = authData && allowedRoles.includes(authData.role);
+  const { currentUser, userRole } = useAuth();
+  const isAuthenticated = currentUser && allowedRoles.includes(userRole);
 
   return (
     <Route

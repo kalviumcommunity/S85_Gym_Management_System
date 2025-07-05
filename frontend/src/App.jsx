@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from './components/Sidebar/Sidebar';
 import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider, useAuth } from "./context";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -41,6 +41,7 @@ import "./App.css";
 
 const AppContent = () => {
   const { currentUser, loading, userRole } = useAuth();
+  
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 

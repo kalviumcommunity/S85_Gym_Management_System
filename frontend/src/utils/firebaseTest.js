@@ -1,3 +1,5 @@
+// Firebase test functions - disabled for build compatibility
+
 import { auth, db } from '../firebase/config';
 import { 
   createUserWithEmailAndPassword, 

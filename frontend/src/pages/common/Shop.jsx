@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context';
+import { useAuth } from '../../context/AuthContext';
 import { 
   ShoppingBag, 
   Search, 
