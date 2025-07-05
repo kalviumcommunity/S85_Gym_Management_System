@@ -118,3 +118,14 @@ body, html {
   height: 200px;
   width: 200px;
 }
+.signup-form select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}

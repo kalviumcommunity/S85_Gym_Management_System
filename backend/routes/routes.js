@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Member } = require("../models/gymSchemas");
-const protect = require("../middleware/authMiddleware");
+const {protect} = require("../middleware/authMiddleware");
 
 router.use(express.json());
 
@@ -14,7 +14,6 @@ router.get("/members", protect, async (req, res) => {
         res.status(500).json({ message: "Server error", error });
     }
 });
-
 // 🔍 Get members by any user ID (admin use)
 router.get("/members/by-user/:userId", protect, async (req, res) => {
     console.log("📡 Route hit with userId:", req.params.userId);

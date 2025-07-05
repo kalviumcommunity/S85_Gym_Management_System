@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./AddMember.css";
 import Lottie from "lottie-react";
 import successAnimation from "../../assets/success.json/Animation - 1744280050642.json";
+import api from "../../axiosConfig"; // Import the configured axios instance
 
 const AddMember = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const AddMember = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,33 +24,19 @@ const AddMember = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form");
-  
+    setError("");
+    
     try {
-      const token = localStorage.getItem("token"); // adjust if you're storing token differently
-  
-      const response = await fetch("http://localhost:3000/api/members", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to add member");
-      }
-  
-      const data = await response.json();
-      console.log("Success:", data);
+      // Use the configured api instance which automatically handles credentials
+      const response = await api.post("/members", formData);
+      
+      console.log("Success:", response.data);
       setSubmitted(true);
     } catch (error) {
-      console.error("Error:", error.message);
-      alert("Something went wrong while adding the member.");
+      console.error("Error:", error);
+      setError(error.response?.data?.message || "Failed to add member");
     }
   };
-  
 
   const handleAddAnother = () => {
     setFormData({
@@ -61,6 +49,7 @@ const AddMember = () => {
       membershipDuration: "",
     });
     setSubmitted(false);
+    setError("");
   };
 
   return (
@@ -81,6 +70,8 @@ const AddMember = () => {
         ) : (
           <form className="glass-form" onSubmit={handleSubmit}>
             <h2>Add Member</h2>
+
+            {error && <div className="error-message">{error}</div>}
 
             <input
               type="text"
@@ -120,13 +111,17 @@ const AddMember = () => {
               <option value="Platinum">Platinum</option>
             </select>
 
-            {/* ✅ Membership Duration dropdown */}
-            <select name="membershipDuration" value={formData.membershipDuration} onChange={handleChange}>
-            <option value="">Select Duration</option>
-            <option value="30">1 month</option>
-            <option value="90">3 months</option>
-            <option value="180">6 months</option>
-            <option value="365">1 year</option>
+            <select 
+              name="membershipDuration" 
+              value={formData.membershipDuration} 
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Duration</option>
+              <option value="30">1 month</option>
+              <option value="90">3 months</option>
+              <option value="180">6 months</option>
+              <option value="365">1 year</option>
             </select>
             
             <input
@@ -136,7 +131,6 @@ const AddMember = () => {
               onChange={handleChange}
               required
             />
-
 
             <button type="submit">Submit</button>
           </form>
