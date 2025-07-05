@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '../../context';
 import { 
   User, 
   Mail, 

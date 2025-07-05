@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '../../context';
 import { UserPlus, Mail, User, Lock, Eye, EyeOff, Bug, TestTube } from 'lucide-react';
 import './AdminPages.css';
 
