@@ -5,35 +5,96 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html, body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: white;
   height: 100%;
   overflow-x: hidden;
 }
 
-/* Loading styles */
-.loading-container {
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f5f5;
+  position: relative;
+}
+
+.main-content {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  transition: margin-left 0.3s ease;
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  overflow-x: hidden;
+}
+
+/* Global page container styles */
+.dashboard-container,
+.member-dashboard,
+.admin-container,
+.error-container,
+.shop-container {
+  width: 100% !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Auth pages should take full viewport */
+.auth-wrapper,
+.signup-wrapper {
+  width: 100vw !important;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container,
+  .member-dashboard,
+  .admin-container,
+  .error-container,
+  .shop-container {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container,
+  .member-dashboard,
+  .admin-container,
+  .error-container,
+  .shop-container {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Loading Container */
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
+  text-align: center;
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid #00CFFF;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #00CFFF;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 @keyframes spin {
@@ -41,63 +102,50 @@ html, body, #root {
   100% { transform: rotate(360deg); }
 }
 
-/* Pending Approval styles */
-.pending-approval-container,
-.suspended-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+.loading-container p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Pending Approval Container */
+.pending-approval-container {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   padding: 2rem;
-  color: white;
 }
 
-.pending-approval-content,
-.suspended-content {
-  text-align: center;
+.pending-approval-content {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 3rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: white;
   max-width: 500px;
   width: 100%;
 }
 
 .pending-icon {
   margin-bottom: 2rem;
-  color: #feca57;
+  color: #ffa726;
 }
 
-.suspended-icon {
-  margin-bottom: 2rem;
-  color: #ff6b7a;
-}
-
-.pending-approval-content h1,
-.suspended-content h1 {
-  font-size: 2.5rem;
+.pending-approval-content h1 {
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(45deg, #feca57, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
-.suspended-content h1 {
-  background: linear-gradient(45deg, #ff6b7a, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.pending-approval-content p,
-.suspended-content p {
+.pending-approval-content p {
   font-size: 1.1rem;
   margin-bottom: 1rem;
-  opacity: 0.8;
+  opacity: 0.9;
   line-height: 1.6;
 }
 
@@ -114,68 +162,97 @@ html, body, #root {
   font-size: 1rem;
 }
 
-.logout-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  background: linear-gradient(45deg, #00CFFF, #0099cc);
+.pending-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* Global logout button styles (for non-sidebar contexts) */
+.logout-btn:not(.sidebar .logout-btn) {
+  background: linear-gradient(135deg, #00CFFF, #0099cc);
+  color: white;
   border: none;
   border-radius: 12px;
-  color: white;
+  padding: 1rem 2rem;
   font-size: 1rem;
   font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  margin-top: 2rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 207, 255, 0.3);
 }
 
-.logout-btn:hover {
+.logout-btn:not(.sidebar .logout-btn):hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 207, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 207, 255, 0.4);
 }
 
-/* Page content padding for fixed navbar */
-.page-content {
-  padding-top: 80px;
+/* Suspended Container */
+.suspended-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 2rem;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
+.suspended-content {
   background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: white;
+  max-width: 500px;
+  width: 100%;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 207, 255, 0.5);
-  border-radius: 4px;
+.suspended-icon {
+  margin-bottom: 2rem;
+  color: #ff6b7a;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 207, 255, 0.7);
+.suspended-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.suspended-content p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+  line-height: 1.6;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .pending-approval-container,
-  .suspended-container {
-    padding: 1rem;
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 70px;
+    width: calc(100% - 70px);
   }
+}
 
+@media (max-width: 600px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 60px; /* Add padding to account for horizontal sidebar */
+  }
+  
   .pending-approval-content,
   .suspended-content {
     padding: 2rem;
+    margin: 1rem;
   }
-
+  
   .pending-approval-content h1,
   .suspended-content h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
-
+  
   .pending-approval-content p,
   .suspended-content p {
     font-size: 1rem;
@@ -183,13 +260,28 @@ html, body, #root {
 }
 
 @media (max-width: 480px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0.5rem;
+  }
+  
+  .auth-wrapper,
+  .signup-wrapper {
+    width: 100vw !important;
+  }
+  
   .pending-approval-content,
   .suspended-content {
     padding: 1.5rem;
   }
-
+  
   .pending-approval-content h1,
   .suspended-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .pending-info {
+    padding: 1rem;
   }
 }

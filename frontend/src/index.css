@@ -11,6 +11,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Custom CSS Variables */
+  --accent-color: #00CFFF;
+  --primary-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --secondary-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -24,10 +39,24 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
+  /* display: flex; */
+  /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Ensure auth pages can use full viewport */
+.auth-wrapper,
+.signup-wrapper {
+  overflow-x: hidden;
 }
 
 h1 {
@@ -66,10 +95,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+/* Remove the body, html, #root background override at the end */
+/*
 body, html, #root {
   margin: 0;
   padding: 0;
-  background-color: #1f1f2e; /* Match your container's background */
+  background-color: #1f1f2e;
   color: #f0f0f0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+*/

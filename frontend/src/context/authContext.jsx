@@ -4,10 +4,12 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
+import { auth, db, testFirebaseConnection } from '../firebase/config';
 
 const AuthContext = createContext();
 
@@ -24,6 +26,10 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [userStatus, setUserStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Google Auth Provider
+  const googleProvider = new GoogleAuthProvider();
 
   // Sign up function for regular members
   const signup = async (email, password, name, profilePic = null) => {
@@ -49,11 +55,89 @@ export const AuthProvider = ({ children }) => {
         profileURL: defaultAvatarURL,
         createdAt: new Date().toISOString(),
         approvedBy: null,
-        approvedAt: null
+        approvedAt: null,
+        authProvider: 'email'
       });
 
+      // Set the user state immediately
+      const mergedUser = {
+        ...user,
+        displayName: name,
+        photoURL: defaultAvatarURL
+      };
+      setCurrentUser(mergedUser);
+      setUserRole('member');
+      setUserStatus('active');
+
+      return mergedUser;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Google Sign In with Popup
+  const signInWithGoogle = async () => {
+    try {
+      setGoogleLoading(true);
+      console.log('Starting Google sign-in...');
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      console.log('Google sign-in successful:', user.email);
+
+      // Check if user already exists in Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
+      if (!userDoc.exists()) {
+        console.log('Creating new user profile...');
+        // New user - create profile with member role
+        const profileURL = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=00CFFF&color=fff&size=200`;
+        
+        await setDoc(doc(db, 'users', user.uid), {
+          name: user.displayName || 'Google User',
+          email: user.email,
+          role: 'member', // Default role for Google signups
+          status: 'active',
+          profileURL: profileURL,
+          createdAt: new Date().toISOString(),
+          approvedBy: null,
+          approvedAt: null,
+          authProvider: 'google'
+        });
+
+        // Set the user state immediately for new Google users
+        const mergedUser = {
+          ...user,
+          displayName: user.displayName || 'Google User',
+          photoURL: profileURL
+        };
+        setCurrentUser(mergedUser);
+        setUserRole('member');
+        setUserStatus('active');
+        console.log('New user created with member role');
+      } else {
+        console.log('Existing user found, getting role...');
+        // Existing user - get their role from Firestore
+        const userData = userDoc.data();
+        const mergedUser = {
+          ...user,
+          displayName: userData.name || user.displayName || 'User',
+          photoURL: userData.profileURL || user.photoURL || null
+        };
+        setCurrentUser(mergedUser);
+        setUserRole(userData.role);
+        setUserStatus(userData.status);
+        console.log('Existing user role:', userData.role);
+      }
+
+      setGoogleLoading(false);
       return user;
     } catch (error) {
+      console.error('Google sign-in error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      setGoogleLoading(false);
       throw error;
     }
   };
@@ -80,7 +164,8 @@ export const AuthProvider = ({ children }) => {
         profileURL: defaultAvatarURL,
         createdAt: new Date().toISOString(),
         approvedBy: null,
-        approvedAt: null
+        approvedAt: null,
+        authProvider: 'email'
       });
 
       return user;
@@ -155,7 +240,27 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
+      const user = userCredential.user;
+      
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      let userData = {};
+      
+      if (userDoc.exists()) {
+        userData = userDoc.data();
+        setUserRole(userData.role);
+        setUserStatus(userData.status);
+      }
+      
+      // Merge Firebase Auth user with Firestore data
+      const mergedUser = {
+        ...user,
+        displayName: userData.name || user.displayName || 'User',
+        photoURL: userData.profileURL || user.photoURL || null
+      };
+      
+      setCurrentUser(mergedUser);
+      return mergedUser;
     } catch (error) {
       throw error;
     }
@@ -165,6 +270,10 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Clear user state
+      setCurrentUser(null);
+      setUserRole(null);
+      setUserStatus(null);
     } catch (error) {
       throw error;
     }
@@ -187,9 +296,49 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Update user profile
-  const updateUserProfile = async (uid, updates) => {
+  const updateUserProfile = async (updates) => {
     try {
-      await setDoc(doc(db, 'users', uid), updates, { merge: true });
+      if (!currentUser) {
+        throw new Error('No user logged in');
+      }
+      
+      // Update Firebase Auth profile
+      if (updates.displayName || updates.photoURL) {
+        await updateProfile(currentUser, {
+          displayName: updates.displayName || currentUser.displayName,
+          photoURL: updates.photoURL || currentUser.photoURL
+        });
+      }
+      
+      // Update Firestore document
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const existingData = userDoc.data();
+        const updatedData = {
+          ...existingData,
+          name: updates.displayName || existingData.name,
+          email: updates.email || existingData.email,
+          phoneNumber: updates.phone || existingData.phoneNumber,
+          address: updates.address || existingData.address,
+          dateOfBirth: updates.dateOfBirth || existingData.dateOfBirth,
+          emergencyContact: updates.emergencyContact || existingData.emergencyContact,
+          fitnessGoals: updates.fitnessGoals || existingData.fitnessGoals,
+          medicalConditions: updates.medicalConditions || existingData.medicalConditions,
+          updatedAt: new Date().toISOString()
+        };
+        
+        await updateDoc(userRef, updatedData);
+        
+        // Update local state
+        const updatedUser = {
+          ...currentUser,
+          displayName: updates.displayName || currentUser.displayName,
+          photoURL: updates.photoURL || currentUser.photoURL
+        };
+        setCurrentUser(updatedUser);
+      }
     } catch (error) {
       throw error;
     }
@@ -213,12 +362,36 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // Test Firebase connection on mount
+    testFirebaseConnection().then(success => {
+      console.log('Firebase connection test result:', success);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', { user: !!user, email: user?.email });
+      
       if (user) {
-        setCurrentUser(user);
-        const role = await getUserRole(user.uid);
-        setUserRole(role);
+        // Get user data from Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        let userData = {};
+        
+        if (userDoc.exists()) {
+          userData = userDoc.data();
+          setUserRole(userData.role);
+          setUserStatus(userData.status);
+        }
+        
+        // Merge Firebase Auth user with Firestore data
+        const mergedUser = {
+          ...user,
+          displayName: userData.name || user.displayName || 'User',
+          photoURL: userData.profileURL || user.photoURL || null
+        };
+        
+        setCurrentUser(mergedUser);
+        console.log('Setting current user:', mergedUser.email, 'with displayName:', mergedUser.displayName);
       } else {
+        console.log('No user, clearing state');
         setCurrentUser(null);
         setUserRole(null);
         setUserStatus(null);
@@ -234,7 +407,9 @@ export const AuthProvider = ({ children }) => {
     userRole,
     userStatus,
     loading,
+    googleLoading,
     signup,
+    signInWithGoogle,
     createStaffAccount,
     approveStaffMember,
     rejectStaffMember,
@@ -252,4 +427,4 @@ export const AuthProvider = ({ children }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
-}; 
+};
