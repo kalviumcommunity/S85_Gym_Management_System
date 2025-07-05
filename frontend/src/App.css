@@ -1,13 +1,195 @@
 /* App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html, body, #root {
   margin: 0;
   padding: 0;
-  background-color: #9d9d9d; /* Light grey background */
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  color: white;
   height: 100%;
+  overflow-x: hidden;
 }
-/* Example if navbar height is ~80px */
+
+/* Loading styles */
+.loading-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #00CFFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pending Approval styles */
+.pending-approval-container,
+.suspended-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: white;
+}
+
+.pending-approval-content,
+.suspended-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 100%;
+}
+
+.pending-icon {
+  margin-bottom: 2rem;
+  color: #feca57;
+}
+
+.suspended-icon {
+  margin-bottom: 2rem;
+  color: #ff6b7a;
+}
+
+.pending-approval-content h1,
+.suspended-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #feca57, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.suspended-content h1 {
+  background: linear-gradient(45deg, #ff6b7a, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pending-approval-content p,
+.suspended-content p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.pending-info {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.pending-info p {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(45deg, #00CFFF, #0099cc);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 2rem;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 207, 255, 0.3);
+}
+
+/* Page content padding for fixed navbar */
 .page-content {
   padding-top: 80px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 207, 255, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 207, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pending-approval-container,
+  .suspended-container {
+    padding: 1rem;
+  }
+
+  .pending-approval-content,
+  .suspended-content {
+    padding: 2rem;
+  }
+
+  .pending-approval-content h1,
+  .suspended-content h1 {
+    font-size: 2rem;
+  }
+
+  .pending-approval-content p,
+  .suspended-content p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pending-approval-content,
+  .suspended-content {
+    padding: 1.5rem;
+  }
+
+  .pending-approval-content h1,
+  .suspended-content h1 {
+    font-size: 1.5rem;
+  }
 }

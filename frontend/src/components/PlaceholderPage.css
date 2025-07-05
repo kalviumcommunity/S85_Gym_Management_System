@@ -1,0 +1,93 @@
+/* Placeholder Page Styles */
+.placeholder-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: white;
+}
+
+.placeholder-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 100%;
+}
+
+.placeholder-icon {
+  margin-bottom: 2rem;
+  color: #feca57;
+}
+
+.placeholder-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #feca57, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.placeholder-content p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+.placeholder-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(45deg, #00CFFF, #0099cc);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 2rem;
+}
+
+.placeholder-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 207, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .placeholder-container {
+    padding: 1rem;
+  }
+
+  .placeholder-content {
+    padding: 2rem;
+  }
+
+  .placeholder-content h1 {
+    font-size: 2rem;
+  }
+
+  .placeholder-content p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .placeholder-content {
+    padding: 1.5rem;
+  }
+
+  .placeholder-content h1 {
+    font-size: 1.5rem;
+  }
+} 
