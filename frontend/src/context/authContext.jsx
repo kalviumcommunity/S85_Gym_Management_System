@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   updateProfile,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  fetchSignInMethodsForEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { auth, db, testFirebaseConnection } from '../firebase/config';
@@ -145,6 +146,12 @@ export const AuthProvider = ({ children }) => {
   // Create staff account (admin only)
   const createStaffAccount = async (email, password, name, profilePic = null) => {
     try {
+      // Check if user already exists
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      if (methods.length > 0) {
+        throw new Error('An account with this email already exists. Please use a different email address.');
+      }
+
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -170,7 +177,23 @@ export const AuthProvider = ({ children }) => {
 
       return user;
     } catch (error) {
-      throw error;
+      console.error('Firebase error:', error);
+      
+      // Handle specific Firebase errors
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          throw new Error('An account with this email already exists. Please use a different email address.');
+        case 'auth/operation-not-allowed':
+          throw new Error('Email/password authentication is not enabled. Please contact the administrator.');
+        case 'auth/weak-password':
+          throw new Error('Password is too weak. Please choose a stronger password.');
+        case 'auth/invalid-email':
+          throw new Error('Please enter a valid email address.');
+        case 'auth/network-request-failed':
+          throw new Error('Network error. Please check your internet connection and try again.');
+        default:
+          throw new Error(error.message || 'Failed to create staff account. Please try again.');
+      }
     }
   };
 
@@ -302,34 +325,48 @@ export const AuthProvider = ({ children }) => {
         throw new Error('No user logged in');
       }
       
-      // Update Firebase Auth profile
+      console.log('Updating profile with:', updates);
+      
+      // Update Firebase Auth profile for display name and photo
       if (updates.displayName || updates.photoURL) {
-        await updateProfile(currentUser, {
+        console.log('Updating Firebase Auth profile...');
+        const authUser = auth.currentUser;
+        if (!authUser) {
+          throw new Error('No authenticated user found');
+        }
+        await updateProfile(authUser, {
           displayName: updates.displayName || currentUser.displayName,
           photoURL: updates.photoURL || currentUser.photoURL
         });
+        console.log('Firebase Auth profile updated successfully');
       }
       
-      // Update Firestore document
+      // Update Firestore document for additional profile data
       const userRef = doc(db, 'users', currentUser.uid);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
         const existingData = userDoc.data();
+        
+        // Filter out undefined values and only include fields that have values
         const updatedData = {
           ...existingData,
-          name: updates.displayName || existingData.name,
-          email: updates.email || existingData.email,
-          phoneNumber: updates.phone || existingData.phoneNumber,
-          address: updates.address || existingData.address,
-          dateOfBirth: updates.dateOfBirth || existingData.dateOfBirth,
-          emergencyContact: updates.emergencyContact || existingData.emergencyContact,
-          fitnessGoals: updates.fitnessGoals || existingData.fitnessGoals,
-          medicalConditions: updates.medicalConditions || existingData.medicalConditions,
           updatedAt: new Date().toISOString()
         };
         
+        // Only add fields that have actual values (not undefined, null, or empty strings)
+        if (updates.displayName) updatedData.name = updates.displayName;
+        if (updates.email) updatedData.email = updates.email;
+        if (updates.phone) updatedData.phoneNumber = updates.phone;
+        if (updates.address) updatedData.address = updates.address;
+        if (updates.dateOfBirth) updatedData.dateOfBirth = updates.dateOfBirth;
+        if (updates.emergencyContact) updatedData.emergencyContact = updates.emergencyContact;
+        if (updates.fitnessGoals) updatedData.fitnessGoals = updates.fitnessGoals;
+        if (updates.medicalConditions) updatedData.medicalConditions = updates.medicalConditions;
+        
+        console.log('Updating Firestore with:', updatedData);
         await updateDoc(userRef, updatedData);
+        console.log('Firestore updated successfully');
         
         // Update local state
         const updatedUser = {
@@ -337,9 +374,22 @@ export const AuthProvider = ({ children }) => {
           displayName: updates.displayName || currentUser.displayName,
           photoURL: updates.photoURL || currentUser.photoURL
         };
+        
+        // Only add fields that have actual values
+        if (updates.phone) updatedUser.phoneNumber = updates.phone;
+        if (updates.address) updatedUser.address = updates.address;
+        if (updates.dateOfBirth) updatedUser.dateOfBirth = updates.dateOfBirth;
+        if (updates.emergencyContact) updatedUser.emergencyContact = updates.emergencyContact;
+        if (updates.fitnessGoals) updatedUser.fitnessGoals = updates.fitnessGoals;
+        if (updates.medicalConditions) updatedUser.medicalConditions = updates.medicalConditions;
         setCurrentUser(updatedUser);
+        console.log('Local state updated');
+      } else {
+        console.error('User document not found in Firestore');
+        throw new Error('User profile not found');
       }
     } catch (error) {
+      console.error('Error updating profile:', error);
       throw error;
     }
   };

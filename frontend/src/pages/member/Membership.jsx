@@ -16,6 +16,7 @@ import {
   Download,
   Share2
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './Membership.css';
 
 const Membership = () => {
@@ -24,44 +25,40 @@ const Membership = () => {
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [error, setError] = useState('');
 
-  // Mock membership data - in real app, this would come from Firestore
   useEffect(() => {
-    const mockMembership = {
-      id: '1',
-      type: 'Premium',
-      status: 'active',
-      startDate: new Date('2024-01-15'),
-      endDate: new Date('2024-12-15'),
-      price: 50,
-      billingCycle: 'monthly',
-      autoRenew: true,
-      features: [
-        'Access to all gym facilities',
-        'Group fitness classes',
-        'Personal training sessions (2/month)',
-        'Locker room access',
-        'Towel service',
-        'Guest passes (2/month)',
-        'Fitness assessment (quarterly)',
-        'Nutrition consultation (monthly)'
-      ],
-      usage: {
-        totalVisits: 45,
-        thisMonth: 12,
-        averagePerWeek: 3.2,
-        lastVisit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
-      },
-      paymentMethod: {
-        type: 'credit_card',
-        last4: '1234',
-        expiry: '12/25'
-      }
-    };
-
-    setMembership(mockMembership);
-    setLoading(false);
+    fetchMembershipData();
   }, []);
+
+  const fetchMembershipData = async () => {
+    try {
+      setLoading(true);
+      
+      if (!currentUser || !currentUser.email) {
+        setError('User not authenticated');
+        return;
+      }
+
+      // Encode the email for URL safety
+      const encodedEmail = encodeURIComponent(currentUser.email);
+      console.log('Fetching membership for email:', currentUser.email);
+      console.log('Encoded email:', encodedEmail);
+      const response = await api.get(`/membership/${encodedEmail}`);
+      console.log('Membership response:', response.data);
+      
+      setMembership(response.data);
+    } catch (err) {
+      console.error('Error fetching membership data:', err);
+      if (err.response?.status === 404) {
+        setError('No membership found for this account');
+      } else {
+        setError('Failed to load membership information');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const membershipPlans = [
     {
@@ -143,9 +140,9 @@ const Membership = () => {
     const start = new Date(membership.startDate);
     const end = new Date(membership.endDate);
     const now = new Date();
-    const total = end - start;
+    const totalDuration = end - start;
     const elapsed = now - start;
-    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
   };
 
   const formatDate = (date) => {
@@ -180,8 +177,44 @@ const Membership = () => {
   if (loading) {
     return (
       <div className="membership-container">
-        <div className="loading-spinner"></div>
-        <p>Loading membership details...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading membership...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="membership-container">
+        <div className="error-container">
+          <X size={48} />
+          <p>{error}</p>
+          <button onClick={fetchMembershipData}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!membership) {
+    return (
+      <div className="membership-container">
+        <div className="no-membership">
+          <Award size={64} />
+          <h2>No Active Membership</h2>
+          <p>You don't have an active membership in our system. This could be because:</p>
+          <ul style={{ textAlign: 'left', margin: '20px 0', paddingLeft: '20px' }}>
+            <li>Your membership hasn't been added to the system yet</li>
+            <li>Your email address doesn't match the one in our membership database</li>
+            <li>You need to contact the gym staff to set up your membership</li>
+          </ul>
+          <p><strong>Current email:</strong> {currentUser?.email}</p>
+          <button className="cta-btn" onClick={() => setShowUpgradeModal(true)}>
+            <Star size={20} />
+            Choose a Plan
+          </button>
+        </div>
       </div>
     );
   }
@@ -190,93 +223,96 @@ const Membership = () => {
     <div className="membership-container">
       <div className="membership-header">
         <div className="header-content">
-          <h1>My Membership</h1>
-          <p>Manage your membership plan and track your fitness journey</p>
+          <h1>Membership Details</h1>
+          <p>Manage your gym membership and track your progress</p>
         </div>
         <div className="header-actions">
+          <button className="action-btn" onClick={() => setShowUpgradeModal(true)}>
+            <RefreshCw size={16} />
+            Upgrade Plan
+          </button>
           <button className="action-btn">
-            <Download size={20} />
+            <Download size={16} />
             Download Card
           </button>
           <button className="action-btn">
-            <Share2 size={20} />
+            <Share2 size={16} />
             Share
           </button>
         </div>
       </div>
 
       <div className="membership-content">
-        {/* Current Membership Card */}
-        <div className="membership-card">
-          <div className="card-header">
-            <div className="membership-info">
-              <div className="membership-type">
+        <div className="membership-overview">
+          <div className="overview-card">
+            <div className="card-header">
+              <div className="membership-badge">
                 <Award size={24} />
-                <h2>{membership.type} Membership</h2>
+                <span>{membership.type}</span>
               </div>
-              <div className="membership-status" style={{ '--status-color': getStatusColor(membership.status) }}>
-                <div className="status-dot"></div>
-                {membership.status.charAt(0).toUpperCase() + membership.status.slice(1)}
+              <div className="status-indicator">
+                <span className={`status ${membership.status}`}>
+                  {membership.status === 'active' ? <CheckCircle size={16} /> : <X size={16} />}
+                  {membership.status}
+                </span>
               </div>
             </div>
-            <div className="membership-price">
-              <span className="price">${membership.price}</span>
-              <span className="billing">/{membership.billingCycle}</span>
-            </div>
-          </div>
-
-          <div className="membership-progress">
-            <div className="progress-info">
-              <span>Membership Progress</span>
-              <span>{Math.round(getMembershipProgress())}%</span>
-            </div>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${getMembershipProgress()}%` }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="membership-dates">
-            <div className="date-item">
-              <Calendar size={16} />
-              <div>
-                <span className="label">Start Date</span>
+            
+            <div className="membership-details">
+              <div className="detail-row">
+                <span className="label">Plan Type:</span>
+                <span className="value">{membership.type}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Billing Cycle:</span>
+                <span className="value">{membership.billingCycle}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Monthly Fee:</span>
+                <span className="value">${membership.price}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Start Date:</span>
                 <span className="value">{formatDate(membership.startDate)}</span>
               </div>
-            </div>
-            <div className="date-item">
-              <Clock size={16} />
-              <div>
-                <span className="label">End Date</span>
+              <div className="detail-row">
+                <span className="label">End Date:</span>
                 <span className="value">{formatDate(membership.endDate)}</span>
               </div>
-            </div>
-            <div className="date-item">
-              <Target size={16} />
-              <div>
-                <span className="label">Days Remaining</span>
-                <span className="value">{getDaysRemaining()} days</span>
+              <div className="detail-row">
+                <span className="label">Auto Renew:</span>
+                <span className="value">{membership.autoRenew ? 'Yes' : 'No'}</span>
               </div>
             </div>
-          </div>
 
-          <div className="membership-features">
-            <h3>Your Benefits</h3>
-            <div className="features-grid">
-              {membership.features.map((feature, index) => (
-                <div key={index} className="feature-item">
-                  <CheckCircle size={16} />
-                  <span>{feature}</span>
-                </div>
-              ))}
+            <div className="membership-progress">
+              <div className="progress-header">
+                <h3>Membership Progress</h3>
+                <span className="days-remaining">{getDaysRemaining()} days remaining</span>
+              </div>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${getMembershipProgress()}%` }}
+                ></div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Usage Statistics */}
-        <div className="usage-section">
+        <div className="membership-features">
+          <h2>Your Benefits</h2>
+          <div className="features-grid">
+            {membership.features.map((feature, index) => (
+              <div key={index} className="feature-item">
+                <CheckCircle size={20} />
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="usage-stats">
           <h2>Usage Statistics</h2>
           <div className="stats-grid">
             <div className="stat-card">
@@ -302,7 +338,7 @@ const Membership = () => {
                 <Target size={24} />
               </div>
               <div className="stat-content">
-                <h3>Avg. per Week</h3>
+                <h3>Avg. Per Week</h3>
                 <p className="stat-value">{membership.usage.averagePerWeek}</p>
               </div>
             </div>
@@ -318,79 +354,22 @@ const Membership = () => {
           </div>
         </div>
 
-        {/* Payment Information */}
-        <div className="payment-section">
+        <div className="payment-info">
           <h2>Payment Information</h2>
           <div className="payment-card">
             <div className="payment-method">
-              <div className="method-info">
-                <CreditCard size={20} />
-                <div>
-                  <h3>Payment Method</h3>
-                  <p>•••• •••• •••• {membership.paymentMethod.last4}</p>
-                  <span>Expires {membership.paymentMethod.expiry}</span>
-                </div>
+              <div className="method-icon">
+                <CreditCard size={24} />
               </div>
-              <button className="update-btn">Update</button>
-            </div>
-            <div className="billing-info">
-              <div className="billing-item">
-                <span className="label">Billing Cycle</span>
-                <span className="value">{membership.billingCycle}</span>
-              </div>
-              <div className="billing-item">
-                <span className="label">Auto Renewal</span>
-                <span className="value">{membership.autoRenew ? 'Enabled' : 'Disabled'}</span>
-              </div>
-              <div className="billing-item">
-                <span className="label">Next Payment</span>
-                <span className="value">{formatDate(membership.endDate)}</span>
+              <div className="method-details">
+                <h3>Payment Method</h3>
+                <p>•••• •••• •••• {membership.paymentMethod.last4}</p>
+                <span className="expiry">Expires {membership.paymentMethod.expiry}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Upgrade Options */}
-        <div className="upgrade-section">
-          <h2>Upgrade Your Membership</h2>
-          <p>Unlock more features and maximize your fitness potential</p>
-          
-          <div className="plans-grid">
-            {membershipPlans.map(plan => (
-              <div key={plan.id} className={`plan-card ${plan.popular ? 'popular' : ''}`}>
-                {plan.popular && (
-                  <div className="popular-badge">
-                    <Star size={16} />
-                    Most Popular
-                  </div>
-                )}
-                
-                <div className="plan-header">
-                  <h3>{plan.name}</h3>
-                  <div className="plan-price">
-                    <span className="price">${plan.price}</span>
-                    <span className="billing">/{plan.billingCycle}</span>
-                  </div>
-                </div>
-
-                <div className="plan-features">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="feature-item">
-                      <CheckCircle size={16} />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button 
-                  className={`upgrade-btn ${plan.id === membership.type.toLowerCase() ? 'current' : ''}`}
-                  onClick={() => handleUpgrade(plan)}
-                  disabled={plan.id === membership.type.toLowerCase()}
-                >
-                  {plan.id === membership.type.toLowerCase() ? 'Current Plan' : 'Upgrade Now'}
-                </button>
-              </div>
-            ))}
+            <button className="update-btn">
+              Update Payment Method
+            </button>
           </div>
         </div>
       </div>

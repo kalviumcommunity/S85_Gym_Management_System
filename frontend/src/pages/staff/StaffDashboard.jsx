@@ -10,18 +10,38 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './StaffPages.css';
 
 const StaffDashboard = () => {
   const { currentUser } = useAuth();
   const [stats, setStats] = useState({
-    totalMembers: 156,
-    activeMembers: 142,
-    pendingPayments: 8,
-    todayCheckins: 23,
-    thisWeekCheckins: 89,
-    monthlyRevenue: 12500
+    totalMembers: 0,
+    activeMembers: 0,
+    pendingPayments: 0,
+    todayCheckins: 0,
+    thisWeekCheckins: 0,
+    monthlyRevenue: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/stats/dashboard');
+      setStats(response.data);
+    } catch (err) {
+      console.error('Error fetching dashboard stats:', err);
+      setError('Failed to load dashboard statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const staffStats = [
     { title: 'Total Members', value: stats.totalMembers.toString(), icon: Users, color: '#00CFFF' },
@@ -46,6 +66,29 @@ const StaffDashboard = () => {
     if (hour < 18) return 'Good Afternoon';
     return 'Good Evening';
   };
+
+  if (loading) {
+    return (
+      <div className="staff-dashboard">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="staff-dashboard">
+        <div className="error-container">
+          <AlertCircle size={48} />
+          <p>{error}</p>
+          <button onClick={fetchDashboardStats}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="staff-dashboard">
@@ -117,7 +160,7 @@ const StaffDashboard = () => {
                   <h4>Check Member Status</h4>
                   <p>Review pending memberships and payments</p>
                 </div>
-                <div className="task-badge">3 pending</div>
+                <div className="task-badge">{stats.pendingPayments} pending</div>
               </div>
               <div className="task-item">
                 <div className="task-icon">
