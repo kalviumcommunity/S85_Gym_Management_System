@@ -156,6 +156,19 @@ const ManageStaff = () => {
                     src={member.profileURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=100`} 
                     alt={member.name}
                     className="staff-avatar"
+                    onError={(e) => {
+                      console.error('Staff image failed to load:', e.target.src);
+                      // Try fallback to generated avatar if original failed
+                      if (member.name && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=100`) {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=100`;
+                      } else {
+                        // Final fallback to default avatar
+                        e.target.src = '/default-avatar.svg';
+                      }
+                    }}
+                    onLoad={(e) => {
+                      console.log('Staff image loaded successfully:', e.target.src);
+                    }}
                   />
                   <div className="staff-details">
                     <h3>{member.name}</h3>

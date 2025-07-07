@@ -111,9 +111,24 @@ const MembersList = () => {
                 <tr key={member._id}>
                   <td>
                     <div className="member-info">
-                      <div className="avatar-placeholder">
-                        {member.name[0].toUpperCase()}
-                      </div>
+                      <img 
+                        src={member.profileURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=40`} 
+                        alt={member.name}
+                        className="member-avatar"
+                        onError={(e) => {
+                          console.error('Member image failed to load:', e.target.src);
+                          // Try fallback to generated avatar if original failed
+                          if (member.name && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=40`) {
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=00CFFF&color=fff&size=40`;
+                          } else {
+                            // Final fallback to default avatar
+                            e.target.src = '/default-avatar.svg';
+                          }
+                        }}
+                        onLoad={(e) => {
+                          console.log('Member image loaded successfully:', e.target.src);
+                        }}
+                      />
                       <div>
                         <strong>{member.name}</strong>
                         <div className="email">{member.email}</div>

@@ -173,8 +173,6 @@ const Profile = () => {
         </div>
       )}
 
-
-
       <div className="profile-content">
         <div className="profile-grid">
           {/* Profile Picture Section */}
@@ -184,7 +182,17 @@ const Profile = () => {
                 src={getProfileImageSrc()}
                 alt="Profile" 
                 onError={(e) => {
-                  e.target.src = '/default-avatar.svg';
+                  console.error('Profile image failed to load:', e.target.src);
+                  // Try fallback to generated avatar if original failed
+                  if (currentUser?.displayName && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=200`) {
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=200`;
+                  } else {
+                    // Final fallback to default avatar
+                    e.target.src = '/default-avatar.svg';
+                  }
+                }}
+                onLoad={(e) => {
+                  console.log('Profile image loaded successfully:', e.target.src);
                 }}
               />
 

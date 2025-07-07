@@ -22,13 +22,17 @@ body {
   position: relative;
 }
 
+/* Main layout container */
 .main-content {
+  flex: 1;
+  padding: 2rem;
+  background: #f8fafc;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  transition: margin-left 0.3s ease;
-  margin-left: 240px;
-  width: calc(100% - 240px);
-  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1; /* Ensure content is above background but below sidebar */
+  margin-left: 240px; /* Account for sidebar width */
+  width: calc(100% - 240px); /* Adjust width to account for sidebar */
 }
 
 /* Global page container styles */
@@ -36,10 +40,14 @@ body {
 .member-dashboard,
 .admin-container,
 .error-container,
-.shop-container {
+.shop-container,
+.profile-container,
+.notifications-container {
   width: 100% !important;
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 /* Auth pages should take full viewport */
@@ -55,46 +63,154 @@ body {
   top: 0;
 }
 
+/* Responsive adjustments for main content */
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+  }
+}
+
 @media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    padding-top: 80px; /* Account for mobile header */
+  }
+  
   .dashboard-container,
   .member-dashboard,
   .admin-container,
   .error-container,
-  .shop-container {
+  .shop-container,
+  .profile-container,
+  .notifications-container {
     padding: 1rem !important;
+  }
+  
+  .error-boundary h1 {
+    font-size: 2rem;
+  }
+  
+  .error-boundary p {
+    font-size: 1rem;
+  }
+  
+  .pending-approval-content,
+  .suspended-content {
+    padding: 2rem;
+    margin: 1rem;
+  }
+  
+  .pending-approval-content h1,
+  .suspended-content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .pending-approval-content p,
+  .suspended-content p {
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
+  .main-content {
+    padding: 0.5rem;
+    padding-top: 70px; /* Account for mobile header */
+  }
+  
   .dashboard-container,
   .member-dashboard,
   .admin-container,
   .error-container,
-  .shop-container {
+  .shop-container,
+  .profile-container,
+  .notifications-container {
     padding: 0.5rem !important;
+  }
+  
+  .auth-wrapper,
+  .signup-wrapper {
+    width: 100vw !important;
+  }
+  
+  .pending-approval-content,
+  .suspended-content {
+    padding: 1.5rem;
+  }
+  
+  .pending-approval-content h1,
+  .suspended-content h1 {
+    font-size: 1.25rem;
+  }
+  
+  .pending-info {
+    padding: 1rem;
   }
 }
 
-/* Loading Container */
+/* Error Boundary Styles */
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.error-boundary h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.error-boundary p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.error-boundary button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-boundary button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Loading Container Improvements */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  text-align: center;
 }
 
 .loading-spinner {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #00CFFF;
+  border-top: 4px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -104,7 +220,7 @@ body {
 
 .loading-container p {
   font-size: 1.1rem;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* Pending Approval Container */
@@ -225,63 +341,4 @@ body {
   margin-bottom: 1rem;
   opacity: 0.9;
   line-height: 1.6;
-}
-
-/* Responsive Design */
-@media (max-width: 900px) {
-  .main-content {
-    margin-left: 70px;
-    width: calc(100% - 70px);
-  }
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-    padding-top: 60px; /* Add padding to account for mobile header */
-  }
-  
-  .pending-approval-content,
-  .suspended-content {
-    padding: 2rem;
-    margin: 1rem;
-  }
-  
-  .pending-approval-content h1,
-  .suspended-content h1 {
-    font-size: 1.5rem;
-  }
-  
-  .pending-approval-content p,
-  .suspended-content p {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-    padding: 0.5rem;
-  }
-  
-  .auth-wrapper,
-  .signup-wrapper {
-    width: 100vw !important;
-  }
-  
-  .pending-approval-content,
-  .suspended-content {
-    padding: 1.5rem;
-  }
-  
-  .pending-approval-content h1,
-  .suspended-content h1 {
-    font-size: 1.25rem;
-  }
-  
-  .pending-info {
-    padding: 1rem;
-  }
 }

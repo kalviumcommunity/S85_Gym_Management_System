@@ -2,67 +2,188 @@ const express = require("express");
 const router = express.Router();
 const { Member } = require("../models/gymSchemas");
 const { User } = require("../models/User");
-const {protect} = require("../middleware/authMiddleware");
+const {verifyFirebaseToken, protect} = require("../middleware/authMiddleware");
 
 router.use(express.json());
 
+// Test endpoint to verify authentication
+router.get("/test-auth", verifyFirebaseToken, async (req, res) => {
+    try {
+        console.log('✅ Test auth endpoint hit successfully');
+        console.log('👤 User:', req.user);
+        res.json({ 
+            message: 'Authentication successful!', 
+            user: req.user,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('❌ Test auth error:', error);
+        res.status(500).json({ error: 'Test auth failed' });
+    }
+});
+
 // 📊 Get dashboard statistics
-router.get("/stats/dashboard", protect, async (req, res) => {
+router.get("/stats/dashboard", verifyFirebaseToken, async (req, res) => {
     try {
         const userRole = req.user.role;
         let stats = {};
 
         if (userRole === 'admin') {
-            // Admin stats - all data
+            // Admin stats - comprehensive data
             const totalMembers = await Member.countDocuments();
             const activeMembers = await Member.countDocuments({ status: 'active' });
+            const inactiveMembers = await Member.countDocuments({ status: 'inactive' });
+            const expiredMembers = await Member.countDocuments({ status: 'expired' });
             const totalUsers = await User.countDocuments();
             const staffUsers = await User.countDocuments({ role: 'staff' });
             
-            // Calculate revenue (mock calculation based on memberships)
-            const memberships = await Member.find();
+            // Calculate revenue based on membership types
+            const memberships = await Member.find({ status: 'active' });
+            const membershipPrices = { 
+                'Gold': 50, 
+                'Platinum': 75, 
+                'Diamond': 100,
+                'Basic': 30,
+                'Premium': 60
+            };
+            
             const monthlyRevenue = memberships.reduce((total, member) => {
-                const membershipPrices = { 'Gold': 50, 'Platinum': 75, 'Diamond': 100 };
                 return total + (membershipPrices[member.membershipType] || 50);
             }, 0);
+
+            // Calculate growth percentage (mock calculation)
+            const lastMonthMembers = Math.floor(totalMembers * 0.9); // Mock: 10% growth
+            const growthPercentage = totalMembers > lastMonthMembers ? 
+                `+${Math.round(((totalMembers - lastMonthMembers) / lastMonthMembers) * 100)}%` : 
+                `${Math.round(((totalMembers - lastMonthMembers) / lastMonthMembers) * 100)}%`;
+
+            // Get membership type distribution
+            const membershipDistribution = await Member.aggregate([
+                {
+                    $group: {
+                        _id: '$membershipType',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            // Get recent members (last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentMembers = await Member.countDocuments({
+                joiningDate: { $gte: thirtyDaysAgo }
+            });
 
             stats = {
                 totalMembers,
                 activeMembers,
+                inactiveMembers,
+                expiredMembers,
                 totalUsers,
                 staffUsers,
                 monthlyRevenue,
-                monthlyGrowth: '+12%', // Mock growth percentage
-                pendingPayments: Math.floor(Math.random() * 10) + 1, // Mock pending payments
-                todayCheckins: Math.floor(Math.random() * 30) + 10, // Mock check-ins
-                thisWeekCheckins: Math.floor(Math.random() * 100) + 50 // Mock weekly check-ins
+                monthlyGrowth: growthPercentage,
+                pendingPayments: Math.floor(Math.random() * 15) + 5,
+                todayCheckins: Math.floor(Math.random() * 40) + 15,
+                thisWeekCheckins: Math.floor(Math.random() * 150) + 80,
+                recentMembers,
+                membershipDistribution
             };
         } else if (userRole === 'staff') {
-            // Staff stats - limited to their scope
+            // Staff stats - focused on member management
             const totalMembers = await Member.countDocuments();
             const activeMembers = await Member.countDocuments({ status: 'active' });
+            const inactiveMembers = await Member.countDocuments({ status: 'inactive' });
+            
+            // Get members created by this staff member
+            const myMembers = await Member.countDocuments({ created_by: req.user.id });
+            
+            // Get recent check-ins (mock data)
+            const todayCheckins = Math.floor(Math.random() * 30) + 10;
+            const thisWeekCheckins = Math.floor(Math.random() * 100) + 50;
+            
+            // Calculate revenue for members managed by this staff
+            const myActiveMembers = await Member.find({ 
+                created_by: req.user.id, 
+                status: 'active' 
+            });
+            
+            const membershipPrices = { 
+                'Gold': 50, 
+                'Platinum': 75, 
+                'Diamond': 100,
+                'Basic': 30,
+                'Premium': 60
+            };
+            
+            const myRevenue = myActiveMembers.reduce((total, member) => {
+                return total + (membershipPrices[member.membershipType] || 50);
+            }, 0);
             
             stats = {
                 totalMembers,
                 activeMembers,
+                inactiveMembers,
+                myMembers,
+                myRevenue,
                 pendingPayments: Math.floor(Math.random() * 10) + 1,
-                todayCheckins: Math.floor(Math.random() * 30) + 10,
-                thisWeekCheckins: Math.floor(Math.random() * 100) + 50,
+                todayCheckins,
+                thisWeekCheckins,
                 monthlyRevenue: Math.floor(Math.random() * 15000) + 10000
             };
         } else {
             // Member stats - personal data
             const member = await Member.findOne({ email: req.user.email });
             if (member) {
-                const daysRemaining = member.membershipDuration ? 
-                    Math.max(0, parseInt(member.membershipDuration) - 
-                    Math.floor((Date.now() - new Date(member.joiningDate).getTime()) / (1000 * 60 * 60 * 24))) : 0;
+                // Calculate days remaining
+                const joiningDate = new Date(member.joiningDate);
+                const membershipDuration = parseInt(member.membershipDuration) || 30;
+                const expiryDate = new Date(joiningDate.getTime() + (membershipDuration * 24 * 60 * 60 * 1000));
+                const now = new Date();
+                const daysRemaining = Math.max(0, Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+                
+                // Calculate membership progress
+                const daysElapsed = Math.floor((now.getTime() - joiningDate.getTime()) / (1000 * 60 * 60 * 24));
+                const progressPercentage = Math.min(100, Math.round((daysElapsed / membershipDuration) * 100));
+                
+                // Mock workout data
+                const totalWorkouts = Math.floor(Math.random() * 25) + 8;
+                const lastWorkoutDays = Math.floor(Math.random() * 7) + 1;
+                const lastWorkout = lastWorkoutDays === 1 ? 'Yesterday' : `${lastWorkoutDays} days ago`;
+                
+                // Calculate membership value
+                const membershipPrices = { 
+                    'Gold': 50, 
+                    'Platinum': 75, 
+                    'Diamond': 100,
+                    'Basic': 30,
+                    'Premium': 60
+                };
+                const membershipValue = membershipPrices[member.membershipType] || 50;
                 
                 stats = {
                     membershipStatus: member.status,
                     daysRemaining: `${daysRemaining} days`,
-                    lastWorkout: '2 days ago', // Mock data
-                    totalWorkouts: Math.floor(Math.random() * 20) + 5 // Mock data
+                    lastWorkout,
+                    totalWorkouts,
+                    progressPercentage,
+                    membershipValue,
+                    membershipType: member.membershipType,
+                    joiningDate: member.joiningDate,
+                    nextPaymentDate: expiryDate.toISOString().split('T')[0]
+                };
+            } else {
+                // Fallback for members without profile
+                stats = {
+                    membershipStatus: 'Unknown',
+                    daysRemaining: '0 days',
+                    lastWorkout: 'Never',
+                    totalWorkouts: 0,
+                    progressPercentage: 0,
+                    membershipValue: 0,
+                    membershipType: 'Unknown',
+                    joiningDate: new Date().toISOString(),
+                    nextPaymentDate: new Date().toISOString().split('T')[0]
                 };
             }
         }
@@ -75,7 +196,7 @@ router.get("/stats/dashboard", protect, async (req, res) => {
 });
 
 // 📈 Get member statistics
-router.get("/stats/members", protect, async (req, res) => {
+router.get("/stats/members", verifyFirebaseToken, async (req, res) => {
     try {
         const totalMembers = await Member.countDocuments();
         const activeMembers = await Member.countDocuments({ status: 'active' });
@@ -114,7 +235,7 @@ router.get("/stats/members", protect, async (req, res) => {
 });
 
 // 🔐 Get members created by the logged-in user
-router.get("/members", protect, async (req, res) => {
+router.get("/members", verifyFirebaseToken, async (req, res) => {
     try {
         const members = await Member.find({ created_by: req.user.id });
         res.json(members);
@@ -123,7 +244,7 @@ router.get("/members", protect, async (req, res) => {
     }
 });
 // 🔍 Get members by any user ID (admin use)
-router.get("/members/by-user/:userId", protect, async (req, res) => {
+router.get("/members/by-user/:userId", verifyFirebaseToken, async (req, res) => {
     console.log("📡 Route hit with userId:", req.params.userId);
     try {
         const members = await Member.find({ created_by: req.params.userId });
@@ -140,7 +261,7 @@ router.get("/members/by-user/:userId", protect, async (req, res) => {
 });
 
 // 🌐 Get ALL members (regardless of user)
-router.get("/members/all", protect, async (req, res) => {
+router.get("/members/all", verifyFirebaseToken, async (req, res) => {
     try {
         const allMembers = await Member.find().populate("created_by", "name email");
         res.json(allMembers);
@@ -164,7 +285,7 @@ router.get("/members/:id", protect, async (req, res) => {
 });
 
 // ➕ Add a new member
-router.post("/members", protect, async (req, res) => {
+router.post("/members", verifyFirebaseToken, async (req, res) => {
     try {
         const { name, email, phone, membershipType, joiningDate, status,membershipDuration } = req.body;
 
@@ -195,7 +316,7 @@ router.post("/members", protect, async (req, res) => {
 });
 
 // 🔁 Update member by ID
-router.put("/members/:id", protect, async (req, res) => {
+router.put("/members/:id", verifyFirebaseToken, async (req, res) => {
     try {
         const updatedMember = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedMember) {
@@ -208,7 +329,7 @@ router.put("/members/:id", protect, async (req, res) => {
 });
 
 // ❌ Delete member by ID
-router.delete("/members/:id", protect, async (req, res) => {
+router.delete("/members/:id", verifyFirebaseToken, async (req, res) => {
     try {
         const deletedMember = await Member.findByIdAndDelete(req.params.id);
         if (!deletedMember) {
@@ -356,6 +477,126 @@ router.get("/membership/:email", async (req, res) => {
     } catch (error) {
         console.error('Error fetching membership:', error);
         res.status(500).json({ message: 'Failed to fetch membership' });
+    }
+});
+
+// 📊 Get analytics data
+router.get("/analytics", verifyFirebaseToken, async (req, res) => {
+    try {
+        const userRole = req.user.role;
+        const { range = 'month' } = req.query;
+
+        if (userRole !== 'admin') {
+            return res.status(403).json({ error: "Access denied. Admin only." });
+        }
+
+        // Calculate date range
+        const now = new Date();
+        let startDate;
+        switch (range) {
+            case 'week':
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+            case 'month':
+                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+            case 'quarter':
+                startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                break;
+            case 'year':
+                startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                break;
+            default:
+                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        }
+
+        // Get member statistics
+        const totalMembers = await Member.countDocuments();
+        const activeMembers = await Member.countDocuments({ status: 'active' });
+        const newMembers = await Member.countDocuments({ 
+            joiningDate: { $gte: startDate } 
+        });
+        const expiredMembers = await Member.countDocuments({ 
+            status: 'expired',
+            endDate: { $gte: startDate }
+        });
+
+        // Calculate growth percentage (mock calculation)
+        const growth = Math.floor(Math.random() * 20) + 5; // 5-25% growth
+
+        // Revenue calculations (mock data)
+        const monthlyRevenue = totalMembers * 50; // $50 per member
+        const totalRevenue = monthlyRevenue * 12;
+        const averageRevenue = monthlyRevenue / totalMembers;
+
+        // Attendance data (mock)
+        const totalCheckins = Math.floor(Math.random() * 5000) + 2000;
+        const averageCheckins = (totalCheckins / activeMembers / 4).toFixed(1); // per week
+        const peakHours = 'Monday 6-8 PM';
+
+        // Recent activities (mock data)
+        const activities = [
+            {
+                id: 1,
+                type: 'new_member',
+                title: 'New member registered',
+                description: 'John Doe',
+                time: '2 hours ago',
+                status: 'positive'
+            },
+            {
+                id: 2,
+                type: 'payment',
+                title: 'Payment received',
+                description: '$99.99 from Jane Smith',
+                time: '4 hours ago',
+                status: 'positive'
+            },
+            {
+                id: 3,
+                type: 'maintenance',
+                title: 'Equipment maintenance',
+                description: 'Treadmill #3 serviced',
+                time: '6 hours ago',
+                status: 'neutral'
+            },
+            {
+                id: 4,
+                type: 'expired',
+                title: 'Membership expired',
+                description: 'Mike Johnson',
+                time: '1 day ago',
+                status: 'negative'
+            }
+        ];
+
+        const analyticsData = {
+            members: {
+                total: totalMembers,
+                active: activeMembers,
+                new: newMembers,
+                expired: expiredMembers,
+                growth: growth
+            },
+            revenue: {
+                total: totalRevenue,
+                monthly: monthlyRevenue,
+                growth: growth + 3, // Revenue grows slightly more than members
+                average: averageRevenue
+            },
+            attendance: {
+                total: totalCheckins,
+                average: parseFloat(averageCheckins),
+                peak: peakHours,
+                growth: Math.floor(Math.random() * 10) - 5 // -5 to +5%
+            },
+            activities: activities
+        };
+
+        res.json(analyticsData);
+    } catch (error) {
+        console.error("Error fetching analytics:", error);
+        res.status(500).json({ error: "Failed to fetch analytics data" });
     }
 });
 

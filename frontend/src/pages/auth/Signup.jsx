@@ -228,7 +228,7 @@ const Signup = () => {
             )}
           </button>
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className="error-msg">{error}</p>}
 
           <p className="switch-auth">
             Already have an account? <a href="/login">Login</a>

@@ -5,9 +5,9 @@ const config = {
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
     FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
     ENV: import.meta.env.VITE_ENV || 'development',
-    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCxJ2tNHnQ7YkLU5EJflD-dy5oTGM1b6rA",
-    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ironcore-fitness-web.firebaseapp.com",
-    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ironcore-fitness-web"
+    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
+    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID
   },
   
   // Production environment
@@ -15,9 +15,9 @@ const config = {
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://s85-gym-management-system.onrender.com/api',
     FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'https://ironcorefit.netlify.app',
     ENV: import.meta.env.VITE_ENV || 'production',
-    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCxJ2tNHnQ7YkLU5EJflD-dy5oTGM1b6rA",
-    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ironcore-fitness-web.firebaseapp.com",
-    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ironcore-fitness-web"
+    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
+    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID
   },
   
   // Staging environment (if needed)
@@ -25,9 +25,9 @@ const config = {
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://s85-gym-management-system.onrender.com/api',
     FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'https://ironcorefit.netlify.app',
     ENV: import.meta.env.VITE_ENV || 'staging',
-    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCxJ2tNHnQ7YkLU5EJflD-dy5oTGM1b6rA",
-    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ironcore-fitness-web.firebaseapp.com",
-    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ironcore-fitness-web"
+    FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
+    FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID
   }
 };
 
@@ -72,10 +72,10 @@ export const getFirebaseConfig = () => ({
   apiKey: appConfig.FIREBASE_API_KEY,
   authDomain: appConfig.FIREBASE_AUTH_DOMAIN,
   projectId: appConfig.FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ironcore-fitness-web.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "826745766393",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:826745766393:web:54ca90c0171af28ba0bd28",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-1FK6RXLCRJ"
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 });
 
 export default appConfig; 
