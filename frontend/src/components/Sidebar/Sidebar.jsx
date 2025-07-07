@@ -118,7 +118,13 @@ const Sidebar = () => {
               alt="Profile" 
               onError={(e) => {
                 console.error('Sidebar image failed to load:', e.target.src);
-                e.target.src = '/default-avatar.svg';
+                // Try fallback to generated avatar if original failed
+                if (currentUser?.displayName && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`) {
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`;
+                } else {
+                  // Final fallback to default avatar
+                  e.target.src = '/default-avatar.svg';
+                }
               }}
               onLoad={(e) => {
                 console.log('Sidebar image loaded successfully:', e.target.src);
@@ -132,19 +138,6 @@ const Sidebar = () => {
               console.log('Logout button clicked');
               logout();
               closeMobileMenu();
-            }}
-            style={{ 
-              display: 'block', 
-              visibility: 'visible', 
-              opacity: 1,
-              position: 'relative',
-              zIndex: 1001,
-              marginTop: '0.5rem',
-              backgroundColor: '#ff0000', /* Temporary red background to make it very visible */
-              color: 'white',
-              border: '2px solid white',
-              fontSize: '14px',
-              fontWeight: 'bold'
             }}
           >
             LOGOUT

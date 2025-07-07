@@ -1,8 +1,164 @@
-import React from 'react';
-import { BarChart3, Users, TrendingUp, Activity } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { 
+  BarChart3, 
+  Users, 
+  TrendingUp, 
+  Activity, 
+  DollarSign,
+  Calendar,
+  Clock,
+  Target,
+  Award,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  RefreshCw
+} from 'lucide-react';
+import api from '../../axiosConfig';
 import './AdminPages.css';
 
 const Analytics = () => {
+  const { currentUser } = useAuth();
+  const [analyticsData, setAnalyticsData] = useState({
+    members: {},
+    revenue: {},
+    attendance: {},
+    activities: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [timeRange, setTimeRange] = useState('month');
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [timeRange]);
+
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Fetch analytics data from API
+      const response = await api.get(`/analytics?range=${timeRange}`);
+      setAnalyticsData(response.data);
+    } catch (err) {
+      console.error('Error fetching analytics:', err);
+      setError('Failed to load analytics data');
+      
+      // Fallback to mock data
+      setAnalyticsData({
+        members: {
+          total: 1247,
+          active: 892,
+          new: 45,
+          expired: 12,
+          growth: 12
+        },
+        revenue: {
+          total: 45230,
+          monthly: 12500,
+          growth: 15,
+          average: 89
+        },
+        attendance: {
+          total: 3240,
+          average: 3.2,
+          peak: 'Monday 6-8 PM',
+          growth: -2
+        },
+        activities: [
+          {
+            id: 1,
+            type: 'new_member',
+            title: 'New member registered',
+            description: 'John Doe',
+            time: '2 hours ago',
+            status: 'positive'
+          },
+          {
+            id: 2,
+            type: 'payment',
+            title: 'Payment received',
+            description: '$99.99 from Jane Smith',
+            time: '4 hours ago',
+            status: 'positive'
+          },
+          {
+            id: 3,
+            type: 'maintenance',
+            title: 'Equipment maintenance',
+            description: 'Treadmill #3 serviced',
+            time: '6 hours ago',
+            status: 'neutral'
+          },
+          {
+            id: 4,
+            type: 'expired',
+            title: 'Membership expired',
+            description: 'Mike Johnson',
+            time: '1 day ago',
+            status: 'negative'
+          }
+        ]
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'positive': return <CheckCircle size={16} />;
+      case 'negative': return <XCircle size={16} />;
+      case 'neutral': return <AlertCircle size={16} />;
+      default: return <Clock size={16} />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'positive': return '#2ed573';
+      case 'negative': return '#ff6b7a';
+      case 'neutral': return '#feca57';
+      default: return '#a4b0be';
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('en-US').format(num);
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-page">
+        <div className="error-container">
+          <AlertCircle size={48} />
+          <p>{error}</p>
+          <button onClick={fetchAnalyticsData}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-page">
       <div className="page-header">
@@ -12,6 +168,22 @@ const Analytics = () => {
             <h1>Analytics Dashboard</h1>
             <p>Comprehensive insights and performance metrics</p>
           </div>
+        </div>
+        <div className="header-actions">
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="time-range-select"
+          >
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="quarter">Last Quarter</option>
+            <option value="year">Last Year</option>
+          </select>
+          <button className="refresh-btn" onClick={fetchAnalyticsData}>
+            <RefreshCw size={16} />
+            Refresh
+          </button>
         </div>
       </div>
 
@@ -26,8 +198,10 @@ const Analytics = () => {
               </div>
               <div className="metric-content">
                 <h3>Total Members</h3>
-                <p className="metric-value">1,247</p>
-                <p className="metric-change positive">+12% this month</p>
+                <p className="metric-value">{formatNumber(analyticsData.members.total)}</p>
+                <p className={`metric-change ${analyticsData.members.growth >= 0 ? 'positive' : 'negative'}`}>
+                  {analyticsData.members.growth >= 0 ? '+' : ''}{analyticsData.members.growth}% this {timeRange}
+                </p>
               </div>
             </div>
 
@@ -37,30 +211,58 @@ const Analytics = () => {
               </div>
               <div className="metric-content">
                 <h3>Active Members</h3>
-                <p className="metric-value">892</p>
-                <p className="metric-change positive">+8% this month</p>
+                <p className="metric-value">{formatNumber(analyticsData.members.active)}</p>
+                <p className="metric-subtitle">
+                  {((analyticsData.members.active / analyticsData.members.total) * 100).toFixed(1)}% active rate
+                </p>
               </div>
             </div>
 
             <div className="metric-card">
               <div className="metric-icon">
-                <TrendingUp size={24} />
+                <DollarSign size={24} />
               </div>
               <div className="metric-content">
                 <h3>Revenue</h3>
-                <p className="metric-value">$45,230</p>
-                <p className="metric-change positive">+15% this month</p>
+                <p className="metric-value">{formatCurrency(analyticsData.revenue.total)}</p>
+                <p className={`metric-change ${analyticsData.revenue.growth >= 0 ? 'positive' : 'negative'}`}>
+                  {analyticsData.revenue.growth >= 0 ? '+' : ''}{analyticsData.revenue.growth}% this {timeRange}
+                </p>
               </div>
             </div>
 
             <div className="metric-card">
               <div className="metric-icon">
-                <BarChart3 size={24} />
+                <Target size={24} />
               </div>
               <div className="metric-content">
                 <h3>Avg. Check-ins</h3>
-                <p className="metric-value">3.2/week</p>
-                <p className="metric-change negative">-2% this month</p>
+                <p className="metric-value">{analyticsData.attendance.average}/week</p>
+                <p className={`metric-change ${analyticsData.attendance.growth >= 0 ? 'positive' : 'negative'}`}>
+                  {analyticsData.attendance.growth >= 0 ? '+' : ''}{analyticsData.attendance.growth}% this {timeRange}
+                </p>
+              </div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-icon">
+                <Award size={24} />
+              </div>
+              <div className="metric-content">
+                <h3>New Members</h3>
+                <p className="metric-value">{analyticsData.members.new}</p>
+                <p className="metric-subtitle">This {timeRange}</p>
+              </div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-icon">
+                <Clock size={24} />
+              </div>
+              <div className="metric-content">
+                <h3>Peak Hours</h3>
+                <p className="metric-value">{analyticsData.attendance.peak}</p>
+                <p className="metric-subtitle">Busiest time</p>
               </div>
             </div>
           </div>
@@ -72,33 +274,81 @@ const Analytics = () => {
           <div className="charts-grid">
             <div className="chart-card">
               <h3>Member Growth</h3>
-              <div className="chart-placeholder">
-                <BarChart3 size={48} />
-                <p>Member growth chart will be displayed here</p>
+              <div className="chart-container">
+                <div className="chart-placeholder">
+                  <BarChart3 size={48} />
+                  <p>Member growth chart will be displayed here</p>
+                  <div className="chart-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">New:</span>
+                      <span className="stat-value">{analyticsData.members.new}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Expired:</span>
+                      <span className="stat-value">{analyticsData.members.expired}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="chart-card">
               <h3>Revenue Trends</h3>
-              <div className="chart-placeholder">
-                <TrendingUp size={48} />
-                <p>Revenue trends chart will be displayed here</p>
+              <div className="chart-container">
+                <div className="chart-placeholder">
+                  <TrendingUp size={48} />
+                  <p>Revenue trends chart will be displayed here</p>
+                  <div className="chart-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Monthly:</span>
+                      <span className="stat-value">{formatCurrency(analyticsData.revenue.monthly)}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Average:</span>
+                      <span className="stat-value">{formatCurrency(analyticsData.revenue.average)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="chart-card">
               <h3>Attendance Patterns</h3>
-              <div className="chart-placeholder">
-                <Activity size={48} />
-                <p>Attendance patterns chart will be displayed here</p>
+              <div className="chart-container">
+                <div className="chart-placeholder">
+                  <Activity size={48} />
+                  <p>Attendance patterns chart will be displayed here</p>
+                  <div className="chart-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Total:</span>
+                      <span className="stat-value">{formatNumber(analyticsData.attendance.total)}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Peak:</span>
+                      <span className="stat-value">{analyticsData.attendance.peak}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="chart-card">
-              <h3>Equipment Usage</h3>
-              <div className="chart-placeholder">
-                <BarChart3 size={48} />
-                <p>Equipment usage chart will be displayed here</p>
+              <h3>Membership Distribution</h3>
+              <div className="chart-container">
+                <div className="chart-placeholder">
+                  <Users size={48} />
+                  <p>Membership distribution chart will be displayed here</p>
+                  <div className="chart-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Active:</span>
+                      <span className="stat-value">{analyticsData.members.active}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Inactive:</span>
+                      <span className="stat-value">{analyticsData.members.total - analyticsData.members.active}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -108,45 +358,43 @@ const Analytics = () => {
         <div className="activity-section">
           <h2>Recent Activity</h2>
           <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-icon positive">
-                <Users size={16} />
+            {analyticsData.activities.map((activity) => (
+              <div key={activity.id} className="activity-item">
+                <div 
+                  className="activity-icon"
+                  style={{ color: getStatusColor(activity.status) }}
+                >
+                  {getStatusIcon(activity.status)}
+                </div>
+                <div className="activity-content">
+                  <p><strong>{activity.title}:</strong> {activity.description}</p>
+                  <span className="activity-time">{activity.time}</span>
+                </div>
               </div>
-              <div className="activity-content">
-                <p><strong>New member registered:</strong> John Doe</p>
-                <span className="activity-time">2 hours ago</span>
-              </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="activity-item">
-              <div className="activity-icon positive">
-                <TrendingUp size={16} />
-              </div>
-              <div className="activity-content">
-                <p><strong>Payment received:</strong> $99.99 from Jane Smith</p>
-                <span className="activity-time">4 hours ago</span>
-              </div>
-            </div>
-
-            <div className="activity-item">
-              <div className="activity-icon neutral">
-                <Activity size={16} />
-              </div>
-              <div className="activity-content">
-                <p><strong>Equipment maintenance:</strong> Treadmill #3 serviced</p>
-                <span className="activity-time">6 hours ago</span>
-              </div>
-            </div>
-
-            <div className="activity-item">
-              <div className="activity-icon negative">
-                <Users size={16} />
-              </div>
-              <div className="activity-content">
-                <p><strong>Membership expired:</strong> Mike Johnson</p>
-                <span className="activity-time">1 day ago</span>
-              </div>
-            </div>
+        {/* Quick Actions */}
+        <div className="quick-actions-section">
+          <h2>Quick Actions</h2>
+          <div className="actions-grid">
+            <button className="action-btn">
+              <Users size={20} />
+              <span>Export Member Data</span>
+            </button>
+            <button className="action-btn">
+              <DollarSign size={20} />
+              <span>Generate Revenue Report</span>
+            </button>
+            <button className="action-btn">
+              <Activity size={20} />
+              <span>View Attendance Report</span>
+            </button>
+            <button className="action-btn">
+              <BarChart3 size={20} />
+              <span>Download Analytics</span>
+            </button>
           </div>
         </div>
       </div>

@@ -14,7 +14,11 @@ import {
   ShoppingBag,
   Bell,
   UserPlus,
-  ShoppingCart
+  ShoppingCart,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import api from '../../axiosConfig';
 import './Dashboard.css';
@@ -26,6 +30,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     // Only redirect if we're on the main dashboard and user has a specific role
@@ -42,20 +47,42 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (userRole) {
+      console.log('🔄 useEffect triggered - userRole:', userRole);
       fetchDashboardStats();
+    } else {
+      console.log('⏳ useEffect triggered but userRole is null/undefined');
     }
   }, [userRole]);
 
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
+      setError('');
+      console.log('🔍 Fetching dashboard stats for user role:', userRole);
+      console.log('🔍 Current user:', currentUser?.email);
+      
       const response = await api.get('/stats/dashboard');
+      console.log('✅ Dashboard stats received:', response.data);
       setStats(response.data);
+      setLastUpdated(new Date());
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
-      setError('Failed to load dashboard statistics');
+      console.error('❌ Error fetching dashboard stats:', err);
+      console.error('❌ Error response:', err.response?.data);
+      setError(err.response?.data?.error || 'Failed to load dashboard statistics');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const testAuth = async () => {
+    try {
+      console.log('🧪 Testing authentication...');
+      const response = await api.get('/test-auth');
+      console.log('✅ Auth test successful:', response.data);
+      alert('Authentication test successful! Check console for details.');
+    } catch (err) {
+      console.error('❌ Auth test failed:', err);
+      alert('Authentication test failed! Check console for details.');
     }
   };
 
@@ -70,27 +97,113 @@ const Dashboard = () => {
     switch (userRole) {
       case 'member':
         return [
-          { title: 'Membership Status', value: stats.membershipStatus || 'Active', icon: Award, color: '#00CFFF' },
-          { title: 'Days Remaining', value: stats.daysRemaining || '45 days', icon: Calendar, color: '#2ed573' },
-          { title: 'Last Workout', value: stats.lastWorkout || '2 days ago', icon: Activity, color: '#feca57' },
-          { title: 'Total Workouts', value: stats.totalWorkouts?.toString() || '12', icon: Target, color: '#a55eea' }
+          { 
+            title: 'Membership Status', 
+            value: stats.membershipStatus || 'Active', 
+            icon: Award, 
+            color: stats.membershipStatus === 'active' ? '#2ed573' : 
+                   stats.membershipStatus === 'expired' ? '#ff4757' : '#feca57',
+            subtitle: stats.membershipType || 'Unknown Plan'
+          },
+          { 
+            title: 'Days Remaining', 
+            value: stats.daysRemaining || '0 days', 
+            icon: Calendar, 
+            color: '#00CFFF',
+            subtitle: `Next payment: ${stats.nextPaymentDate || 'N/A'}`
+          },
+          { 
+            title: 'Last Workout', 
+            value: stats.lastWorkout || 'Never', 
+            icon: Activity, 
+            color: '#feca57',
+            subtitle: `${stats.totalWorkouts || 0} total workouts`
+          },
+          { 
+            title: 'Membership Progress', 
+            value: `${stats.progressPercentage || 0}%`, 
+            icon: Target, 
+            color: '#a55eea',
+            subtitle: `Value: $${stats.membershipValue || 0}/month`
+          }
         ];
       case 'staff':
         return [
-          { title: 'Total Members', value: stats.totalMembers?.toString() || '0', icon: Users, color: '#00CFFF' },
-          { title: 'Active Members', value: stats.activeMembers?.toString() || '0', icon: Activity, color: '#2ed573' },
-          { title: 'Pending Payments', value: stats.pendingPayments?.toString() || '0', icon: DollarSign, color: '#feca57' },
-          { title: 'Today\'s Check-ins', value: stats.todayCheckins?.toString() || '0', icon: Clock, color: '#a55eea' }
+          { 
+            title: 'Total Members', 
+            value: stats.totalMembers?.toString() || '0', 
+            icon: Users, 
+            color: '#00CFFF',
+            subtitle: `${stats.myMembers || 0} managed by you`
+          },
+          { 
+            title: 'Active Members', 
+            value: stats.activeMembers?.toString() || '0', 
+            icon: Activity, 
+            color: '#2ed573',
+            subtitle: `${stats.inactiveMembers || 0} inactive`
+          },
+          { 
+            title: 'Pending Payments', 
+            value: stats.pendingPayments?.toString() || '0', 
+            icon: DollarSign, 
+            color: '#feca57',
+            subtitle: `Revenue: $${stats.myRevenue || 0}`
+          },
+          { 
+            title: 'Today\'s Check-ins', 
+            value: stats.todayCheckins?.toString() || '0', 
+            icon: Clock, 
+            color: '#a55eea',
+            subtitle: `${stats.thisWeekCheckins || 0} this week`
+          }
         ];
       case 'admin':
         return [
-          { title: 'Total Revenue', value: `$${stats.monthlyRevenue?.toLocaleString() || '0'}`, icon: DollarSign, color: '#00CFFF' },
-          { title: 'Active Members', value: stats.activeMembers?.toString() || '0', icon: Users, color: '#2ed573' },
-          { title: 'Monthly Growth', value: stats.monthlyGrowth || '+12%', icon: TrendingUp, color: '#feca57' },
-          { title: 'Staff Members', value: stats.staffUsers?.toString() || '0', icon: Award, color: '#a55eea' }
+          { 
+            title: 'Total Revenue', 
+            value: `$${stats.monthlyRevenue?.toLocaleString() || '0'}`, 
+            icon: DollarSign, 
+            color: '#00CFFF',
+            subtitle: `${stats.recentMembers || 0} new members this month`
+          },
+          { 
+            title: 'Active Members', 
+            value: stats.activeMembers?.toString() || '0', 
+            icon: Users, 
+            color: '#2ed573',
+            subtitle: `${stats.totalMembers || 0} total members`
+          },
+          { 
+            title: 'Monthly Growth', 
+            value: stats.monthlyGrowth || '+0%', 
+            icon: TrendingUp, 
+            color: '#feca57',
+            subtitle: `${stats.staffUsers || 0} staff members`
+          },
+          { 
+            title: 'System Health', 
+            value: stats.expiredMembers ? `${stats.expiredMembers} expired` : 'All Good', 
+            icon: Award, 
+            color: stats.expiredMembers > 0 ? '#ff4757' : '#a55eea',
+            subtitle: `${stats.pendingPayments || 0} pending payments`
+          }
         ];
       default:
         return [];
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'active':
+        return <CheckCircle size={16} color="#2ed573" />;
+      case 'expired':
+        return <XCircle size={16} color="#ff4757" />;
+      case 'inactive':
+        return <AlertCircle size={16} color="#feca57" />;
+      default:
+        return <AlertCircle size={16} color="#feca57" />;
     }
   };
 
@@ -118,8 +231,13 @@ const Dashboard = () => {
     return (
       <div className="dashboard-container">
         <div className="error-container">
+          <AlertCircle size={48} color="#ff4757" />
+          <h3>Failed to Load Dashboard</h3>
           <p>{error}</p>
-          <button onClick={fetchDashboardStats}>Retry</button>
+          <button onClick={fetchDashboardStats} className="retry-btn">
+            <RefreshCw size={16} />
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -131,16 +249,40 @@ const Dashboard = () => {
         <div className="welcome-section">
           <h1>{getGreeting()}, {currentUser.displayName}!</h1>
           <p>Welcome to your {userRole} dashboard</p>
+          {lastUpdated && (
+            <small className="last-updated">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </small>
+          )}
         </div>
         <div className="user-info">
           <img 
             src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'User')}&background=00CFFF&color=fff&size=100`} 
             alt="Profile" 
             className="user-avatar"
+            onError={(e) => {
+              console.error('Dashboard image failed to load:', e.target.src);
+              // Try fallback to generated avatar if original failed
+              if (currentUser?.displayName && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`) {
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`;
+              } else {
+                // Final fallback to default avatar
+                e.target.src = '/default-avatar.svg';
+              }
+            }}
+            onLoad={(e) => {
+              console.log('Dashboard image loaded successfully:', e.target.src);
+            }}
           />
           <div className="user-details">
             <span className="user-name">{currentUser.displayName}</span>
             <span className="user-role">{userRole}</span>
+            {userRole === 'member' && stats.membershipStatus && (
+              <div className="status-indicator">
+                {getStatusIcon(stats.membershipStatus)}
+                <span>{stats.membershipStatus}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -156,6 +298,9 @@ const Dashboard = () => {
               <div className="stat-content">
                 <h3>{stat.title}</h3>
                 <p className="stat-value">{stat.value}</p>
+                {stat.subtitle && (
+                  <p className="stat-subtitle">{stat.subtitle}</p>
+                )}
               </div>
             </div>
           );
@@ -163,7 +308,16 @@ const Dashboard = () => {
       </div>
 
       <div className="quick-actions">
-        <h2>Quick Actions</h2>
+        <div className="actions-header">
+          <h2>Quick Actions</h2>
+          <button onClick={fetchDashboardStats} className="refresh-btn" disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'spinning' : ''} />
+            Refresh
+          </button>
+          <button onClick={testAuth} className="test-btn" style={{ marginLeft: '10px' }}>
+            Test Auth
+          </button>
+        </div>
         <div className="actions-grid">
           {/* Member Actions */}
           {userRole === 'member' && (

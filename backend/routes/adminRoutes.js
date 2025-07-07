@@ -1,5 +1,5 @@
 const express = require("express");
-const { protect} = require("../middleware/authMiddleware");
+const { verifyFirebaseToken} = require("../middleware/authMiddleware");
 const {authorizeRoles } = require("../middleware/authMiddleware");
 const {
   getAllUsers,
@@ -20,8 +20,8 @@ const {
 
 const router = express.Router();
 
-// Apply `protect` first to ensure user is authenticated
-router.use(protect);
+// Apply `verifyFirebaseToken` first to ensure user is authenticated
+router.use(verifyFirebaseToken);
 
 // Apply `authorizeRoles` to check for 'admin' role
 router.use(authorizeRoles("admin"));

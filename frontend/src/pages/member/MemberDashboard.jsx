@@ -80,6 +80,30 @@ const MemberDashboard = () => {
           <h1>Welcome back, {currentUser?.displayName}!</h1>
           <p>Track your fitness journey and stay motivated</p>
         </div>
+        <div className="user-info">
+          <img 
+            src={currentUser?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.displayName || 'User')}&background=00CFFF&color=fff&size=100`} 
+            alt="Profile" 
+            className="user-avatar"
+            onError={(e) => {
+              console.error('MemberDashboard image failed to load:', e.target.src);
+              // Try fallback to generated avatar if original failed
+              if (currentUser?.displayName && e.target.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`) {
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName)}&background=00CFFF&color=fff&size=100`;
+              } else {
+                // Final fallback to default avatar
+                e.target.src = '/default-avatar.svg';
+              }
+            }}
+            onLoad={(e) => {
+              console.log('MemberDashboard image loaded successfully:', e.target.src);
+            }}
+          />
+          <div className="user-details">
+            <span className="user-name">{currentUser?.displayName}</span>
+            <span className="user-role">Member</span>
+          </div>
+        </div>
       </div>
 
       <div className="stats-grid">

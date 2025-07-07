@@ -5,7 +5,8 @@ import {
   signOut, 
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  getIdToken
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
@@ -23,8 +24,25 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [userStatus, setUserStatus] = useState('active');
   const [loading, setLoading] = useState(true);
-  const [redirectLoading, setRedirectLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [idToken, setIdToken] = useState(null);
+
+  // Get Firebase ID token
+  const getFirebaseToken = async (user) => {
+    try {
+      if (user) {
+        const token = await getIdToken(user, true); // Force refresh
+        setIdToken(token);
+        return token;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting Firebase token:', error);
+      return null;
+    }
+  };
 
   // Sign up function
   const signup = async (email, password, name, role = 'member') => {
@@ -37,8 +55,12 @@ export const AuthProvider = ({ children }) => {
         name,
         email,
         role,
+        status: 'active',
         createdAt: new Date().toISOString()
       });
+
+      // Get ID token for backend authentication
+      await getFirebaseToken(user);
 
       return user;
     } catch (error) {
@@ -50,7 +72,12 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
+      const user = userCredential.user;
+      
+      // Get ID token for backend authentication
+      await getFirebaseToken(user);
+      
+      return user;
     } catch (error) {
       throw error;
     }
@@ -59,7 +86,7 @@ export const AuthProvider = ({ children }) => {
   // Google sign in
   const signInWithGoogle = async () => {
     try {
-      setRedirectLoading(true);
+      setGoogleLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
@@ -73,15 +100,19 @@ export const AuthProvider = ({ children }) => {
           name: user.displayName,
           email: user.email,
           role: 'member',
+          status: 'active',
           createdAt: new Date().toISOString()
         });
       }
+
+      // Get ID token for backend authentication
+      await getFirebaseToken(user);
 
       return user;
     } catch (error) {
       throw error;
     } finally {
-      setRedirectLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -89,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      setIdToken(null);
     } catch (error) {
       throw error;
     }
@@ -99,7 +131,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', uid));
       if (userDoc.exists()) {
-        return userDoc.data().role;
+        const userData = userDoc.data();
+        setUserStatus(userData.status || 'active');
+        return userData.role;
       }
       return 'member'; // default role
     } catch (error) {
@@ -115,9 +149,14 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
         const role = await getUserRole(user.uid);
         setUserRole(role);
+        
+        // Get ID token for backend authentication
+        await getFirebaseToken(user);
       } else {
         setCurrentUser(null);
         setUserRole(null);
+        setUserStatus('active');
+        setIdToken(null);
       }
       setLoading(false);
     });
@@ -125,15 +164,33 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // Set up token refresh
+  useEffect(() => {
+    if (currentUser) {
+      const refreshToken = setInterval(async () => {
+        try {
+          await getFirebaseToken(currentUser);
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+        }
+      }, 10 * 60 * 1000); // Refresh every 10 minutes
+
+      return () => clearInterval(refreshToken);
+    }
+  }, [currentUser]);
+
   const value = {
     currentUser,
     userRole,
+    userStatus,
     loading,
-    redirectLoading,
+    googleLoading,
+    idToken,
     signup,
     login,
     logout,
     signInWithGoogle,
+    getFirebaseToken,
     setCurrentUser,
     setUserRole,
     setLoading

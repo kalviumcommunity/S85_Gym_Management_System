@@ -18,13 +18,15 @@ const config = {
   production: {
     PORT: process.env.PORT || 3000,
     NODE_ENV: 'production',
-    DB_URL: process.env.DB_URL || 'mongodb://localhost:27017/gym_management_system',
-    JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret_key_here_prod',
+    DB_URL: process.env.DB_URL || 'mongodb+srv://your_mongodb_atlas_connection_string_here',
+    JWT_SECRET: process.env.JWT_SECRET || 'your_secure_jwt_secret_key_here_prod',
     FRONTEND_URL: process.env.FRONTEND_URL || 'https://ironcorefit.netlify.app',
     BACKEND_URL: process.env.BACKEND_URL || 'https://s85-gym-management-system.onrender.com',
     CORS_ORIGINS: [
       'https://ironcorefit.netlify.app',
-      'https://s85-gym-management-system.onrender.com'
+      'https://ironcorefit.netlify.app/',
+      'https://s85-gym-management-system.onrender.com',
+      'https://s85-gym-management-system.onrender.com/'
     ]
   }
 };

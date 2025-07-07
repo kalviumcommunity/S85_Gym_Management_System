@@ -6,8 +6,28 @@ import { getFirebaseConfig } from '../config/config.js';
 // Get Firebase configuration from centralized config
 const firebaseConfig = getFirebaseConfig();
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Validate Firebase config
+const validateFirebaseConfig = (config) => {
+  const requiredFields = ['apiKey', 'authDomain', 'projectId'];
+  const missingFields = requiredFields.filter(field => !config[field]);
+  
+  if (missingFields.length > 0) {
+    console.error('Missing Firebase configuration:', missingFields);
+    throw new Error(`Missing Firebase configuration: ${missingFields.join(', ')}`);
+  }
+  
+  return config;
+};
+
+// Initialize Firebase with validation
+let app;
+try {
+  const validatedConfig = validateFirebaseConfig(firebaseConfig);
+  app = initializeApp(validatedConfig);
+} catch (error) {
+  console.error('Failed to initialize Firebase:', error);
+  throw error;
+}
 
 // Initialize Firebase services
 export const auth = getAuth(app);
