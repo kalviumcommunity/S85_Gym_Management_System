@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserPlus, Check, X, Eye, Search, Filter, Calendar, Phone, Mail } from 'lucide-react';
 import axios from 'axios';
 import './AdminPages.css';
+import AdminLayout from './AdminLayout';
 
 const PendingSignups = () => {
   const [signups, setSignups] = useState([]);
@@ -12,6 +13,7 @@ const PendingSignups = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [actionModal, setActionModal] = useState({ show: false, action: '', signup: null });
   const [notes, setNotes] = useState('');
+  const [error, setError] = useState('');
 
   const statuses = ['pending', 'approved', 'rejected'];
 
@@ -21,11 +23,15 @@ const PendingSignups = () => {
 
   const fetchSignups = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await axios.get('/api/admin/pending-signups');
-      setSignups(response.data);
-      setLoading(false);
+      setSignups(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching signups:', error);
+      setError('Failed to load pending signups. Access denied or server error.');
+      setSignups([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -86,24 +92,29 @@ const PendingSignups = () => {
 
   if (loading) {
     return (
-      <div className="admin-page">
+      <AdminLayout title="Pending Signups" description="Review and approve new member registrations and manage signup requests." icon={<UserPlus />}>
         <div className="loading">Loading...</div>
-      </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Pending Signups" description="Review and approve new member registrations and manage signup requests." icon={<UserPlus />}>
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchSignups}>Retry</button>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="page-header">
-        <div className="header-content">
-          <UserPlus className="header-icon" />
-          <div>
-            <h1>Pending Signups</h1>
-            <p>Review and approve new member registrations and manage signup requests.</p>
-          </div>
-        </div>
-      </div>
-
+    <AdminLayout
+      title="Pending Signups"
+      description="Review and approve new member registrations and manage signup requests."
+      icon={<UserPlus />}
+    >
       <div className="filters-section">
         <div className="search-box">
           <Search size={20} />
@@ -339,7 +350,7 @@ const PendingSignups = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

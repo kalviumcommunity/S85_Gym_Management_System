@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Package, Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
 import axios from 'axios';
 import './AdminPages.css';
+import AdminLayout from './AdminLayout';
 
 const ManageShop = () => {
   const [items, setItems] = useState([]);
@@ -18,6 +19,7 @@ const ManageShop = () => {
     stock: '',
     image: ''
   });
+  const [error, setError] = useState('');
 
   const categories = ['Supplements', 'Equipment', 'Clothing', 'Accessories', 'Beverages'];
 
@@ -27,11 +29,15 @@ const ManageShop = () => {
 
   const fetchItems = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await axios.get('/api/admin/shop-items');
-      setItems(response.data);
-      setLoading(false);
+      setItems(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching items:', error);
+      setError('Failed to load shop items. Access denied or server error.');
+      setItems([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -97,22 +103,29 @@ const ManageShop = () => {
 
   if (loading) {
     return (
-      <div className="admin-page">
+      <AdminLayout title="Manage Shop" description="Add, edit, and manage shop items, set prices, and control inventory." icon={<Package />}>
         <div className="loading">Loading...</div>
-      </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Manage Shop" description="Add, edit, and manage shop items, set prices, and control inventory." icon={<Package />}>
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchItems}>Retry</button>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="page-header">
-        <div className="header-content">
-          <Package className="header-icon" />
-          <div>
-            <h1>Manage Shop</h1>
-            <p>Add, edit, and manage shop items, set prices, and control inventory.</p>
-          </div>
-        </div>
+    <AdminLayout
+      title="Manage Shop"
+      description="Add, edit, and manage shop items, set prices, and control inventory."
+      icon={<Package />}
+      actions={
         <button 
           className="btn-primary"
           onClick={() => {
@@ -124,8 +137,8 @@ const ManageShop = () => {
           <Plus size={20} />
           Add Item
         </button>
-      </div>
-
+      }
+    >
       <div className="filters-section">
         <div className="search-box">
           <Search size={20} />
@@ -149,7 +162,6 @@ const ManageShop = () => {
           </select>
         </div>
       </div>
-
       <div className="items-grid">
         {filteredItems.map(item => (
           <div key={item._id} className="item-card">
@@ -280,7 +292,7 @@ const ManageShop = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

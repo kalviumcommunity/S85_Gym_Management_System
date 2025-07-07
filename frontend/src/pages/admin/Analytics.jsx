@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import api from '../../axiosConfig';
 import './AdminPages.css';
+import AdminLayout from './AdminLayout';
 
 const Analytics = () => {
   const { currentUser } = useAuth();
@@ -38,14 +39,19 @@ const Analytics = () => {
     try {
       setLoading(true);
       setError('');
-
       // Fetch analytics data from API
       const response = await api.get(`/analytics?range=${timeRange}`);
-      setAnalyticsData(response.data);
+      // Defensive: ensure the response has the expected structure
+      const data = response.data;
+      setAnalyticsData({
+        members: data.members || {},
+        revenue: data.revenue || {},
+        attendance: data.attendance || {},
+        activities: Array.isArray(data.activities) ? data.activities : []
+      });
     } catch (err) {
       console.error('Error fetching analytics:', err);
-      setError('Failed to load analytics data');
-      
+      setError('Failed to load analytics data. Access denied or server error.');
       // Fallback to mock data
       setAnalyticsData({
         members: {
@@ -138,38 +144,33 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <div className="admin-page">
+      <AdminLayout title="Analytics Dashboard" description="Comprehensive insights and performance metrics" icon={<BarChart3 />}>
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>Loading analytics...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="admin-page">
+      <AdminLayout title="Analytics Dashboard" description="Comprehensive insights and performance metrics" icon={<BarChart3 />}>
         <div className="error-container">
-          <AlertCircle size={48} />
           <p>{error}</p>
           <button onClick={fetchAnalyticsData}>Retry</button>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="page-header">
-        <div className="header-content">
-          <BarChart3 size={32} className="header-icon" />
-          <div>
-            <h1>Analytics Dashboard</h1>
-            <p>Comprehensive insights and performance metrics</p>
-          </div>
-        </div>
-        <div className="header-actions">
+    <AdminLayout
+      title="Analytics Dashboard"
+      description="Comprehensive insights and performance metrics"
+      icon={<BarChart3 />}
+      actions={
+        <>
           <select 
             value={timeRange} 
             onChange={(e) => setTimeRange(e.target.value)}
@@ -184,9 +185,9 @@ const Analytics = () => {
             <RefreshCw size={16} />
             Refresh
           </button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       <div className="analytics-grid">
         {/* Key Metrics Cards */}
         <div className="metrics-section">
@@ -198,10 +199,8 @@ const Analytics = () => {
               </div>
               <div className="metric-content">
                 <h3>Total Members</h3>
-                <p className="metric-value">{formatNumber(analyticsData.members.total)}</p>
-                <p className={`metric-change ${analyticsData.members.growth >= 0 ? 'positive' : 'negative'}`}>
-                  {analyticsData.members.growth >= 0 ? '+' : ''}{analyticsData.members.growth}% this {timeRange}
-                </p>
+                <span className="metric-value">{formatNumber(analyticsData.members.total)}</span>
+                <span className={`metric-change ${analyticsData.members.growth >= 0 ? 'positive' : 'negative'}`}>{analyticsData.members.growth}%</span>
               </div>
             </div>
 
@@ -398,7 +397,7 @@ const Analytics = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
