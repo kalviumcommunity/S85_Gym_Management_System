@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.js';
 
 const Dashboard = () => {
   const { currentUser, userRole } = useAuth();
