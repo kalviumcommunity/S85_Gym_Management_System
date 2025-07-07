@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Wrench, Plus, Edit, Trash2, Search, Filter, Clock, Users } from 'lucide-react';
 import axios from 'axios';
 import './AdminPages.css';
+import AdminLayout from './AdminLayout';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -19,6 +20,7 @@ const Services = () => {
     instructor: '',
     maxCapacity: ''
   });
+  const [error, setError] = useState('');
 
   const categories = ['Fitness', 'Wellness', 'Training', 'Classes', 'Consultation'];
   const durations = ['30 minutes', '1 hour', '1.5 hours', '2 hours', 'Custom'];
@@ -29,11 +31,15 @@ const Services = () => {
 
   const fetchServices = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await axios.get('/api/admin/services');
-      setServices(response.data);
-      setLoading(false);
+      setServices(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching services:', error);
+      setError('Failed to load services. Access denied or server error.');
+      setServices([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -102,22 +108,29 @@ const Services = () => {
 
   if (loading) {
     return (
-      <div className="admin-page">
+      <AdminLayout title="Manage Services" description="Add, edit, and manage gym services, classes, and training programs." icon={<Wrench />}>
         <div className="loading">Loading...</div>
-      </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Manage Services" description="Add, edit, and manage gym services, classes, and training programs." icon={<Wrench />}>
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchServices}>Retry</button>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="page-header">
-        <div className="header-content">
-          <Wrench className="header-icon" />
-          <div>
-            <h1>Manage Services</h1>
-            <p>Add, edit, and manage gym services, classes, and training programs.</p>
-          </div>
-        </div>
+    <AdminLayout
+      title="Manage Services"
+      description="Add, edit, and manage gym services, classes, and training programs."
+      icon={<Wrench />}
+      actions={
         <button 
           className="btn-primary"
           onClick={() => {
@@ -129,8 +142,8 @@ const Services = () => {
           <Plus size={20} />
           Add Service
         </button>
-      </div>
-
+      }
+    >
       <div className="filters-section">
         <div className="search-box">
           <Search size={20} />
@@ -154,7 +167,6 @@ const Services = () => {
           </select>
         </div>
       </div>
-
       <div className="services-grid">
         {filteredServices.map(service => (
           <div key={service._id} className="service-card">
@@ -315,7 +327,7 @@ const Services = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 
