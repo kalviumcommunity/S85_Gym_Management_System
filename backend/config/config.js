@@ -26,7 +26,8 @@ const config = {
       'https://ironcorefit.netlify.app',
       'https://ironcorefit.netlify.app/',
       'https://s85-gym-management-system.onrender.com',
-      'https://s85-gym-management-system.onrender.com/'
+      'https://s85-gym-management-system.onrender.com/',
+      'http://localhost:5173'
     ]
   }
 };
