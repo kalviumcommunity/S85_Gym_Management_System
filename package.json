@@ -21,6 +21,11 @@
     "sequelize": "^6.37.7"
   },
   "author": "madhav",
-  "license": "ISC"
+
+  
+  "license": "ISC",
+  "engines": {
+    "node": "20.x"
+  }
 
 }
