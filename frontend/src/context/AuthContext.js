@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
@@ -11,8 +11,10 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 
+// Create the AuthContext
 const AuthContext = createContext();
 
+// Custom hook to use AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -21,6 +23,7 @@ export const useAuth = () => {
   return context;
 };
 
+// AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -29,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [idToken, setIdToken] = useState(null);
 
-  // Get Firebase ID token
+  // Helper: Get Firebase ID token
   const getFirebaseToken = async (user) => {
     try {
       if (user) {
@@ -44,70 +47,55 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Sign up function
+  // Signup
   const signup = async (email, password, name, role = 'member') => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Save user data to Firestore
       await setDoc(doc(db, 'users', user.uid), {
         name,
         email,
         role,
         status: 'active',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
-
-      // Get ID token for backend authentication
       await getFirebaseToken(user);
-
       return user;
     } catch (error) {
       throw error;
     }
   };
 
-  // Login function
+  // Login
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      
-      // Get ID token for backend authentication
       await getFirebaseToken(user);
-      
       return user;
     } catch (error) {
       throw error;
     }
   };
 
-  // Google sign in
+  // Google Sign In
   const signInWithGoogle = async () => {
     try {
       setGoogleLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-
-      // Check if user exists in Firestore
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      
       if (!userDoc.exists()) {
-        // Create new user document
         await setDoc(doc(db, 'users', user.uid), {
           name: user.displayName,
           email: user.email,
           role: 'member',
           status: 'active',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         });
       }
-
-      // Get ID token for backend authentication
       await getFirebaseToken(user);
-
       return user;
     } catch (error) {
       throw error;
@@ -116,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
+  // Logout
   const logout = async () => {
     try {
       await signOut(auth);
@@ -135,7 +123,7 @@ export const AuthProvider = ({ children }) => {
         setUserStatus(userData.status || 'active');
         return userData.role;
       }
-      return 'member'; // default role
+      return 'member';
     } catch (error) {
       console.error('Error getting user role:', error);
       return 'member';
@@ -149,8 +137,6 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
         const role = await getUserRole(user.uid);
         setUserRole(role);
-        
-        // Get ID token for backend authentication
         await getFirebaseToken(user);
       } else {
         setCurrentUser(null);
@@ -160,11 +146,10 @@ export const AuthProvider = ({ children }) => {
       }
       setLoading(false);
     });
-
     return unsubscribe;
   }, []);
 
-  // Set up token refresh
+  // Token refresh interval
   useEffect(() => {
     if (currentUser) {
       const refreshToken = setInterval(async () => {
@@ -173,12 +158,12 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Error refreshing token:', error);
         }
-      }, 10 * 60 * 1000); // Refresh every 10 minutes
-
+      }, 10 * 60 * 1000); // 10 minutes
       return () => clearInterval(refreshToken);
     }
   }, [currentUser]);
 
+  // Context value
   const value = {
     currentUser,
     userRole,
@@ -193,7 +178,7 @@ export const AuthProvider = ({ children }) => {
     getFirebaseToken,
     setCurrentUser,
     setUserRole,
-    setLoading
+    setLoading,
   };
 
   return (
@@ -201,4 +186,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}; 
