@@ -2,15 +2,15 @@
 const config = {
   // Development environment
   development: {
-    PORT: process.env.PORT || 3000,
+    PORT: process.env.PORT || 3001,
     NODE_ENV: 'development',
     DB_URL: process.env.DB_URL || 'mongodb://localhost:27017/gym_management_system',
     JWT_SECRET: process.env.JWT_SECRET || 'your_jwt_secret_key_here_dev',
     FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
-    BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:3000',
+    BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:3001',
     CORS_ORIGINS: [
       'http://localhost:5173',
-      'http://localhost:3000'
+      'http://localhost:3001'
     ]
   },
   
