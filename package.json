@@ -4,7 +4,7 @@
   "description": "A gym management system",
   "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js",
+    "start": "NODE_ENV=production node backend/server.js",
     "dev": "node backend/server.js"
   },
   "dependencies": {

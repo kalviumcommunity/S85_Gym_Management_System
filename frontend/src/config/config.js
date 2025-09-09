@@ -2,7 +2,7 @@
 const config = {
   // Development environment
   development: {
-    API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+    API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
     FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
     ENV: import.meta.env.VITE_ENV || 'development',
     FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,

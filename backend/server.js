@@ -42,15 +42,17 @@ app.use(cors({
         
         // Log the origin for debugging
         console.log('CORS request from origin:', origin);
+        console.log('Current environment:', config.NODE_ENV);
+        console.log('Allowed origins:', config.CORS_ORIGINS);
         
         if (config.CORS_ORIGINS.indexOf(origin) !== -1) {
             console.log('CORS allowed for origin:', origin);
             callback(null, true);
         } else {
             console.log('CORS blocked origin:', origin);
-            console.log('Allowed origins:', config.CORS_ORIGINS);
-            // For production, allow the request but log it
+            // For production, be more permissive with CORS to handle deployment issues
             if (config.NODE_ENV === 'production') {
+                console.log('Production mode: allowing origin');
                 callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'));
@@ -60,7 +62,8 @@ app.use(cors({
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: false
 }));
 
 // Home route
