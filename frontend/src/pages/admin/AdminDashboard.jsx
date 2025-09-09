@@ -10,33 +10,43 @@ import {
   Bell,
   TrendingUp,
   DollarSign,
-  Activity
+  Activity,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
+import api from '../../axiosConfig';
 import './AdminPages.css';
 
 const AdminDashboard = () => {
-  const { getAllStaffMembers } = useAuth();
+  const { currentUser, userRole } = useAuth();
   const [stats, setStats] = useState({
-    totalStaff: 0,
-    pendingStaff: 0,
-    activeStaff: 0
+    totalMembers: 0,
+    activeMembers: 0,
+    monthlyRevenue: 0,
+    staffUsers: 0,
+    expiredMembers: 0,
+    pendingPayments: 0,
+    monthlyGrowth: '+0%',
+    recentMembers: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    loadStats();
-  }, []);
+    if (userRole === 'admin') {
+      fetchDashboardStats();
+    }
+  }, [userRole]);
 
-  const loadStats = async () => {
+  const fetchDashboardStats = async () => {
     try {
-      const staffMembers = await getAllStaffMembers();
-      setStats({
-        totalStaff: staffMembers.length,
-        pendingStaff: staffMembers.filter(m => m.role === 'pending_staff').length,
-        activeStaff: staffMembers.filter(m => m.role === 'staff').length
-      });
-    } catch (error) {
-      console.error('Error loading stats:', error);
+      setLoading(true);
+      setError('');
+      const response = await api.get('/stats/dashboard');
+      setStats(response.data);
+    } catch (err) {
+      console.error('Error fetching admin dashboard stats:', err);
+      setError('Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }
@@ -49,7 +59,7 @@ const AdminDashboard = () => {
       icon: Users,
       link: "/staff",
       color: "#00CFFF",
-      badge: stats.pendingStaff > 0 ? `${stats.pendingStaff} pending` : null
+      badge: stats.pendingPayments > 0 ? `${stats.pendingPayments} pending` : null
     },
     {
       title: "Create Staff",
@@ -102,31 +112,54 @@ const AdminDashboard = () => {
       <div className="admin-header">
         <div className="header-content">
           <h1>Admin Dashboard</h1>
-          <p>Manage your gym operations and monitor performance</p>
+          <p>Welcome back, {currentUser?.displayName}! Monitor your gym's performance</p>
+          <button onClick={fetchDashboardStats} className="refresh-btn" disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'spinning' : ''} />
+            Refresh Data
+          </button>
         </div>
-        <div className="header-stats">
-          <div className="stat-card">
-            <Users size={24} />
-            <div>
-              <h3>Total Staff</h3>
-              <p>{stats.totalStaff}</p>
+        {error ? (
+          <div className="error-container">
+            <AlertCircle size={24} color="#ff4757" />
+            <p>{error}</p>
+            <button onClick={fetchDashboardStats} className="retry-btn">Retry</button>
+          </div>
+        ) : (
+          <div className="header-stats">
+            <div className="stat-card">
+              <DollarSign size={24} />
+              <div>
+                <h3>Monthly Revenue</h3>
+                <p>${stats.monthlyRevenue?.toLocaleString() || '0'}</p>
+                <small>{stats.recentMembers || 0} new members</small>
+              </div>
+            </div>
+            <div className="stat-card active">
+              <Users size={24} />
+              <div>
+                <h3>Active Members</h3>
+                <p>{stats.activeMembers || 0}</p>
+                <small>{stats.totalMembers || 0} total members</small>
+              </div>
+            </div>
+            <div className="stat-card growth">
+              <TrendingUp size={24} />
+              <div>
+                <h3>Growth Rate</h3>
+                <p>{stats.monthlyGrowth || '+0%'}</p>
+                <small>{stats.staffUsers || 0} staff members</small>
+              </div>
+            </div>
+            <div className="stat-card pending">
+              <Activity size={24} />
+              <div>
+                <h3>System Health</h3>
+                <p>{stats.expiredMembers > 0 ? `${stats.expiredMembers} expired` : 'All Good'}</p>
+                <small>{stats.pendingPayments || 0} pending payments</small>
+              </div>
             </div>
           </div>
-          <div className="stat-card pending">
-            <Activity size={24} />
-            <div>
-              <h3>Pending Approval</h3>
-              <p>{stats.pendingStaff}</p>
-            </div>
-          </div>
-          <div className="stat-card active">
-            <TrendingUp size={24} />
-            <div>
-              <h3>Active Staff</h3>
-              <p>{stats.activeStaff}</p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="admin-content">

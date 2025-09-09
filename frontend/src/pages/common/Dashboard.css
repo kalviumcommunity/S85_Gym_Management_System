@@ -345,4 +345,77 @@
   .error-container {
     padding: 2rem 1rem;
   }
-} 
+}
+
+/* Status Badge Styles */
+.membership-status {
+  margin-top: 0.5rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background: rgba(46, 213, 115, 0.2);
+  color: #2ed573;
+  border: 1px solid #2ed573;
+}
+
+.status-badge.expired {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid #ff4757;
+}
+
+.status-badge.inactive {
+  background: rgba(254, 202, 87, 0.2);
+  color: #feca57;
+  border: 1px solid #feca57;
+}
+
+/* Test Button */
+.test-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(165, 94, 234, 0.2);
+  border: 1px solid #a55eea;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.test-btn:hover {
+  background: rgba(165, 94, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #00CFFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}

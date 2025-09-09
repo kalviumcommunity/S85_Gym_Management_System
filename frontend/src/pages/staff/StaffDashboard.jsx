@@ -18,6 +18,9 @@ const StaffDashboard = () => {
   const [stats, setStats] = useState({
     totalMembers: 0,
     activeMembers: 0,
+    inactiveMembers: 0,
+    myMembers: 0,
+    myRevenue: 0,
     pendingPayments: 0,
     todayCheckins: 0,
     thisWeekCheckins: 0,
@@ -44,12 +47,34 @@ const StaffDashboard = () => {
   };
 
   const staffStats = [
-    { title: 'Total Members', value: stats.totalMembers.toString(), icon: Users, color: '#00CFFF' },
-    { title: 'Active Members', value: stats.activeMembers.toString(), icon: Activity, color: '#2ed573' },
-    { title: 'Pending Payments', value: stats.pendingPayments.toString(), icon: DollarSign, color: '#feca57' },
-    { title: 'Today\'s Check-ins', value: stats.todayCheckins.toString(), icon: Clock, color: '#a55eea' },
-    { title: 'This Week', value: stats.thisWeekCheckins.toString(), icon: Calendar, color: '#ff6b7a' },
-    { title: 'Monthly Revenue', value: `$${stats.monthlyRevenue.toLocaleString()}`, icon: Target, color: '#00CFFF' }
+    { 
+      title: 'Total Members', 
+      value: stats.totalMembers?.toString() || '0', 
+      icon: Users, 
+      color: '#00CFFF',
+      subtitle: `${stats.myMembers || 0} managed by you`
+    },
+    { 
+      title: 'Active Members', 
+      value: stats.activeMembers?.toString() || '0', 
+      icon: Activity, 
+      color: '#2ed573',
+      subtitle: `${stats.inactiveMembers || 0} inactive`
+    },
+    { 
+      title: 'Pending Payments', 
+      value: stats.pendingPayments?.toString() || '0', 
+      icon: DollarSign, 
+      color: '#feca57',
+      subtitle: `Revenue: $${stats.myRevenue || 0}`
+    },
+    { 
+      title: 'Today\'s Check-ins', 
+      value: stats.todayCheckins?.toString() || '0', 
+      icon: Clock, 
+      color: '#a55eea',
+      subtitle: `${stats.thisWeekCheckins || 0} this week`
+    }
   ];
 
   const recentActivities = [
@@ -116,6 +141,9 @@ const StaffDashboard = () => {
               <div className="stat-content">
                 <h3>{stat.title}</h3>
                 <p className="stat-value">{stat.value}</p>
+                {stat.subtitle && (
+                  <p className="stat-subtitle">{stat.subtitle}</p>
+                )}
               </div>
             </div>
           );
