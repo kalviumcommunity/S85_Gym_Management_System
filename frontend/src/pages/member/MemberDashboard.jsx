@@ -36,16 +36,39 @@ const MemberDashboard = () => {
   };
 
   const memberStats = [
-    { title: 'Membership Status', value: stats.membershipStatus || 'Active', icon: Award, color: '#00CFFF' },
-    { title: 'Days Remaining', value: stats.daysRemaining || '45 days', icon: Calendar, color: '#2ed573' },
-    { title: 'Last Workout', value: stats.lastWorkout || '2 days ago', icon: Activity, color: '#feca57' },
-    { title: 'Total Workouts', value: stats.totalWorkouts?.toString() || '12', icon: Target, color: '#a55eea' },
-    { title: 'Monthly Fee', value: '$50', icon: DollarSign, color: '#ff6b7a' },
-    { title: 'Next Payment', value: '15 days', icon: Clock, color: '#00CFFF' }
+    { 
+      title: 'Membership Status', 
+      value: stats.membershipStatus || 'Unknown', 
+      icon: Award, 
+      color: stats.membershipStatus === 'active' ? '#2ed573' : 
+             stats.membershipStatus === 'expired' ? '#ff4757' : '#feca57',
+      subtitle: stats.membershipType || 'Unknown Plan'
+    },
+    { 
+      title: 'Days Remaining', 
+      value: stats.daysRemaining || '0 days', 
+      icon: Calendar, 
+      color: '#00CFFF',
+      subtitle: `Next payment: ${stats.nextPaymentDate || 'N/A'}`
+    },
+    { 
+      title: 'Last Workout', 
+      value: stats.lastWorkout || 'Never', 
+      icon: Activity, 
+      color: '#feca57',
+      subtitle: `${stats.totalWorkouts || 0} total workouts`
+    },
+    { 
+      title: 'Membership Progress', 
+      value: `${stats.progressPercentage || 0}%`, 
+      icon: Target, 
+      color: '#a55eea',
+      subtitle: `Value: $${stats.membershipValue || 0}/month`
+    }
   ];
 
   const recentActivities = [
-    { activity: 'Cardio Session', time: '2 days ago', duration: '45 min' },
+    { activity: 'Cardio Session', time: stats.lastWorkout || '2 days ago', duration: '45 min' },
     { activity: 'Strength Training', time: '4 days ago', duration: '60 min' },
     { activity: 'Yoga Class', time: '1 week ago', duration: '30 min' },
     { activity: 'Swimming', time: '1 week ago', duration: '30 min' }
@@ -79,6 +102,13 @@ const MemberDashboard = () => {
         <div className="welcome-section">
           <h1>Welcome back, {currentUser?.displayName}!</h1>
           <p>Track your fitness journey and stay motivated</p>
+          {stats.membershipStatus && (
+            <div className="membership-status">
+              <span className={`status-badge ${stats.membershipStatus}`}>
+                {stats.membershipStatus}
+              </span>
+            </div>
+          )}
         </div>
         <div className="user-info">
           <img 
@@ -117,6 +147,9 @@ const MemberDashboard = () => {
               <div className="stat-content">
                 <h3>{stat.title}</h3>
                 <p className="stat-value">{stat.value}</p>
+                {stat.subtitle && (
+                  <p className="stat-subtitle">{stat.subtitle}</p>
+                )}
               </div>
             </div>
           );
