@@ -1,4 +1,10 @@
-require("dotenv").config();
+// Load environment variables
+const path = require("path");
+const dotenv = require("dotenv");
+
+// Load environment-specific config
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+dotenv.config({ path: path.join(__dirname, 'config', envFile) });
 const express = require("express");
 const mongoose = require("mongoose");
 const connectDatabase = require("./middleware/db");
@@ -7,7 +13,6 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const path = require("path");
 const config = require("./config/config");
 
 const adminRoutes = require("./routes/adminRoutes");

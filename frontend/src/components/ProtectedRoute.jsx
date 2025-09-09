@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.js';
+import { useAuth } from '../context/AuthContext';
 import { Clock, AlertCircle } from 'lucide-react';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
