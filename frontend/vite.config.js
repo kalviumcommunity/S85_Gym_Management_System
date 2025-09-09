@@ -13,6 +13,13 @@ export default defineConfig({
   build: {
     target: 'es2020',
     rollupOptions: {
+      external: (id) => {
+        // Handle the motion-utils globalThis-config.mjs issue
+        if (id.includes('globalThis-config.mjs')) {
+          return false;
+        }
+        return false;
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
@@ -26,7 +33,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
+    exclude: ['motion-utils'],
     esbuildOptions: {
       target: 'es2020'
     }
