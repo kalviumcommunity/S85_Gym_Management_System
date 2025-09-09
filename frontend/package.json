@@ -16,7 +16,7 @@
   "dependencies": {
     "axios": "^1.8.4",
     "firebase": "^11.10.0",
-    "framer-motion": "^12.23.0",
+    "framer-motion": "^10.18.0",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.525.0",
     "react": "^19.0.0",
